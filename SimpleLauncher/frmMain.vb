@@ -8,7 +8,7 @@ Public Class frmMain
 
     Private dialog As New diaSettings
     'Private datFile As String = My.Application.Info.DirectoryPath.ToString() & "\Enid.dat"
-    Private datFile As String = "C:\Users\Nick\Desktop\Enid.dat"
+    Private datFile As String = "C:\Users\Nick\Desktop\Enid.dat" ' TODO: Remove for release!
 
     Private tmpControl As MagicControl
     Private lastPoint As Point = New Point(-1, -1)
@@ -38,6 +38,8 @@ Public Class frmMain
     End Sub
 
     Private Sub Button_Clicked(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        If Not isLocked Then Exit Sub
+
         Dim activeButton As New Button
         activeButton = sender
 
