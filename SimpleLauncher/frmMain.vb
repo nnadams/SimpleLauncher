@@ -13,7 +13,7 @@ Public Class frmMain
     Private tmpControl As MagicControl
     Private lastPoint As Point = New Point(-1, -1)
 
-    Private Sub RenameToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RenameToolStripMenuItem.Click
+    Private Sub csitemRename_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles csitemRename.Click
         Dim control As New ToolStripMenuItem
         Dim strip As New ContextMenuStrip
         Dim activeButton As New Button
@@ -24,7 +24,7 @@ Public Class frmMain
         activeButton.Text = InputBox("Enter a name:" & vbCrLf & "'" & activeButton.Text & "'", "Choose Name", activeButton.Text)
     End Sub
 
-    Private Sub RemoveToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RemoveToolStripMenuItem.Click
+    Private Sub csitemRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles csitemRemove.Click
         Dim control As New ToolStripMenuItem
         Dim strip As New ContextMenuStrip
         Dim activeButton As New Button
@@ -37,19 +37,20 @@ Public Class frmMain
         End If
     End Sub
 
-    Private Sub Button_Clicked(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        If Not isLocked Then Exit Sub
+    Private Sub Button_MouseDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs)
+        If Not isLocked And e.Button = Windows.Forms.MouseButtons.Right Then
+            csButtons.Show(sender, e.Location)
+        ElseIf isLocked And e.Button = Windows.Forms.MouseButtons.Left Then
+            Dim activeButton As New Button
+            activeButton = sender
 
-        Dim activeButton As New Button
-        activeButton = sender
-
-        If activeButton.Tag = "" Or dialog.OpenFileDialog1.FileName = "" Then Exit Sub
-
-        Process.Start(dialog.OpenFileDialog1.FileName, Chr(34) & activeButton.Tag & Chr(34))
+            If activeButton.Tag = "" Or dialog.openDialog.FileName = "" Then Exit Sub
+            Process.Start(dialog.openDialog.FileName, Chr(34) & activeButton.Tag & Chr(34))
+        End If
     End Sub
 
     Private Sub frmMain_DragEnter(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles MyBase.DragEnter
-        If e.Data.GetDataPresent(DataFormats.FileDrop) Then
+        If e.Data.GetDataPresent(DataFormats.FileDrop) And dialog.chkEnAuto.Checked = True Then
             e.Effect = DragDropEffects.Copy
         Else
             e.Effect = DragDropEffects.None
@@ -78,8 +79,8 @@ Public Class frmMain
                     If tmp = "" Then tmp = RemovePath(fileLoc)
                     newButton.Text = tmp
 
-                    newButton.ContextMenuStrip = ContextMenuStrip1
-                    AddHandler newButton.Click, AddressOf Button_Clicked
+                    newButton.ContextMenuStrip = csButtons
+                    AddHandler newButton.MouseDown, AddressOf Button_MouseDown
                     Me.Controls.Add(newButton)
                     tmpControl = New MagicControl(newButton)
                 Else
@@ -105,44 +106,37 @@ Public Class frmMain
         Return Path
     End Function
 
-    Private Sub ToolStripButton3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton3.Click
+    Private Sub tbtnSettings_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbtnSettings.Click
         dialog.ShowDialog()
     End Sub
 
-    Private Sub ToolStripButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton1.Click
+    Private Sub tbtnLock_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbtnLock.Click
         If isLocked Then
-            ToolStripButton1.Image = ImageList1.Images(0)
+            tbtnLock.Image = My.Resources.lock_open
             isLocked = False
         Else
-            ToolStripButton1.Image = ImageList1.Images(1)
+            tbtnLock.Image = My.Resources.lock
             isLocked = True
         End If
     End Sub
 
-    Private Sub ToolStripButton2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton2.Click
+    Private Sub tbtnSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbtnSave.Click
+        Me.Cursor = Cursors.WaitCursor
         With My.Computer.FileSystem
             .WriteAllText(datFile, dialog.numCols.Value.ToString & vbCrLf, False)
             .WriteAllText(datFile, dialog.numRows.Value.ToString & vbCrLf, True)
-            .WriteAllText(datFile, dialog.OpenFileDialog1.FileName & vbCrLf, True)
+            .WriteAllText(datFile, dialog.chkEnAuto.Checked.ToString & vbCrLf, True)
+            .WriteAllText(datFile, dialog.openDialog.FileName & vbCrLf, True)
 
             On Error Resume Next
             For Each control As Button In Me.Controls
                 .WriteAllText(datFile, control.Tag & "|" & control.Text & "|" & control.Location.X & "|" & control.Location.Y & vbCrLf, True)
             Next
         End With
+        Me.Cursor = Cursors.Default
     End Sub
 
     Private Sub frmMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        ToolStrip1.Items.Add(ToolStripButton1)
-        ToolStrip1.Items.Add(New ToolStripSeparator)
-        ToolStrip1.Items.Add(ToolStripButton2)
-        ToolStrip1.Items.Add(New ToolStripSeparator)
-        ToolStrip1.Items.Add(ToolStripButton3)
-
-        ToolStripButton1.Image = ImageList1.Images(0)
-        ToolStripButton2.Image = ImageList1.Images(3)
-        ToolStripButton3.Image = ImageList1.Images(2)
-
         If Not My.Computer.FileSystem.FileExists(datFile) Then Exit Sub
 
         Dim sreader As New StreamReader(datFile)
@@ -158,7 +152,9 @@ Public Class frmMain
                 Case 1
                     dialog.numRows.Value = CInt(line)
                 Case 2
-                    dialog.OpenFileDialog1.FileName = line
+                    If line = "True" Then dialog.chkEnAuto.Checked = True
+                Case 3
+                    dialog.openDialog.FileName = line
                 Case Else
                     If line = "" Then Exit Do
                     buffer = Split(line, "|")
@@ -167,7 +163,7 @@ Public Class frmMain
                     newButton.Location = New Point(buffer(2), buffer(3))
                     newButton.Tag = buffer(0)
                     newButton.Text = buffer(1)
-                    AddHandler newButton.Click, AddressOf Button_Clicked
+                    AddHandler newButton.MouseDown, AddressOf Button_MouseDown
                     Me.Controls.Add(newButton)
                     tmpControl = New MagicControl(newButton)
             End Select

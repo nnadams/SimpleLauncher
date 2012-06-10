@@ -31,7 +31,7 @@
         Select Case onEdge
             Case EdgeEnum.Inside
                 If outlineDrawn Then activeControl.Refresh()
-                outlineDrawn = True ' No outline to draw.
+                outlineDrawn = True
             Case EdgeEnum.Left
                 g.FillRectangle(Brushes.Fuchsia, 0, 0, mWidth, activeControl.Height)
                 outlineDrawn = True

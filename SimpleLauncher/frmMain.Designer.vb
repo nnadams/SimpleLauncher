@@ -23,93 +23,81 @@ Partial Class frmMain
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmMain))
-        Me.ToolStrip1 = New System.Windows.Forms.ToolStrip
-        Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator
-        Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator
-        Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
-        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton
-        Me.ToolStripButton2 = New System.Windows.Forms.ToolStripButton
-        Me.ToolStripButton3 = New System.Windows.Forms.ToolStripButton
-        Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.RenameToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.RemoveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ContextMenuStrip1.SuspendLayout()
+        Me.tsMain = New System.Windows.Forms.ToolStrip
+        Me.csButtons = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.csitemRename = New System.Windows.Forms.ToolStripMenuItem
+        Me.csitemRemove = New System.Windows.Forms.ToolStripMenuItem
+        Me.tbtnLock = New System.Windows.Forms.ToolStripButton
+        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
+        Me.tbtnSave = New System.Windows.Forms.ToolStripButton
+        Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator
+        Me.tbtnSettings = New System.Windows.Forms.ToolStripButton
+        Me.tsMain.SuspendLayout()
         Me.SuspendLayout()
         '
-        'ToolStrip1
+        'tsMain
         '
-        Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
-        Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(492, 25)
-        Me.ToolStrip1.TabIndex = 1
-        Me.ToolStrip1.Text = "ToolStrip1"
+        Me.tsMain.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
+        Me.tsMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tbtnLock, Me.ToolStripSeparator1, Me.tbtnSave, Me.ToolStripSeparator2, Me.tbtnSettings})
+        Me.tsMain.Location = New System.Drawing.Point(0, 0)
+        Me.tsMain.Name = "tsMain"
+        Me.tsMain.Size = New System.Drawing.Size(492, 25)
+        Me.tsMain.TabIndex = 1
         '
-        'ToolStripSeparator3
+        'csButtons
         '
-        Me.ToolStripSeparator3.Name = "ToolStripSeparator3"
-        Me.ToolStripSeparator3.Size = New System.Drawing.Size(6, 25)
+        Me.csButtons.Name = "ContextMenuStrip1"
+        Me.csButtons.ShowImageMargin = False
+        Me.csButtons.Size = New System.Drawing.Size(36, 4)
         '
-        'ToolStripSeparator4
+        'csitemRename
         '
-        Me.ToolStripSeparator4.Name = "ToolStripSeparator4"
-        Me.ToolStripSeparator4.Size = New System.Drawing.Size(6, 25)
+        Me.csitemRename.Name = "csitemRename"
+        Me.csitemRename.Size = New System.Drawing.Size(92, 22)
+        Me.csitemRename.Text = "Rename"
         '
-        'ImageList1
+        'csitemRemove
         '
-        Me.ImageList1.ImageStream = CType(resources.GetObject("ImageList1.ImageStream"), System.Windows.Forms.ImageListStreamer)
-        Me.ImageList1.TransparentColor = System.Drawing.Color.Transparent
-        Me.ImageList1.Images.SetKeyName(0, "lock_open.png")
-        Me.ImageList1.Images.SetKeyName(1, "lock.png")
-        Me.ImageList1.Images.SetKeyName(2, "cog.png")
-        Me.ImageList1.Images.SetKeyName(3, "disk.png")
+        Me.csitemRemove.Name = "csitemRemove"
+        Me.csitemRemove.Size = New System.Drawing.Size(127, 22)
+        Me.csitemRemove.Text = "Remove"
         '
-        'ToolStripButton1
+        'tbtnLock
         '
-        Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton1.Name = "ToolStripButton1"
-        Me.ToolStripButton1.Size = New System.Drawing.Size(23, 22)
-        Me.ToolStripButton1.Text = "Lock/Unlock"
+        Me.tbtnLock.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.tbtnLock.Image = Global.Enid.My.Resources.Resources.lock_open
+        Me.tbtnLock.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.tbtnLock.Name = "tbtnLock"
+        Me.tbtnLock.Size = New System.Drawing.Size(23, 22)
+        Me.tbtnLock.Text = "Lock/Unlock"
         '
-        'ToolStripButton2
+        'ToolStripSeparator1
         '
-        Me.ToolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton2.Image = CType(resources.GetObject("ToolStripButton2.Image"), System.Drawing.Image)
-        Me.ToolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton2.Name = "ToolStripButton2"
-        Me.ToolStripButton2.Size = New System.Drawing.Size(23, 22)
-        Me.ToolStripButton2.Text = "Save"
+        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(6, 25)
         '
-        'ToolStripButton3
+        'tbtnSave
         '
-        Me.ToolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton3.Image = CType(resources.GetObject("ToolStripButton3.Image"), System.Drawing.Image)
-        Me.ToolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton3.Name = "ToolStripButton3"
-        Me.ToolStripButton3.Size = New System.Drawing.Size(23, 22)
-        Me.ToolStripButton3.Text = "Settings"
-        Me.ToolStripButton3.ToolTipText = "Settings"
+        Me.tbtnSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.tbtnSave.Image = Global.Enid.My.Resources.Resources.disk
+        Me.tbtnSave.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.tbtnSave.Name = "tbtnSave"
+        Me.tbtnSave.Size = New System.Drawing.Size(23, 22)
+        Me.tbtnSave.Text = "Save"
         '
-        'ContextMenuStrip1
+        'ToolStripSeparator2
         '
-        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RenameToolStripMenuItem, Me.RemoveToolStripMenuItem})
-        Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.ShowImageMargin = False
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(93, 48)
+        Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(6, 25)
         '
-        'RenameToolStripMenuItem
+        'tbtnSettings
         '
-        Me.RenameToolStripMenuItem.Name = "RenameToolStripMenuItem"
-        Me.RenameToolStripMenuItem.Size = New System.Drawing.Size(92, 22)
-        Me.RenameToolStripMenuItem.Text = "Rename"
-        '
-        'RemoveToolStripMenuItem
-        '
-        Me.RemoveToolStripMenuItem.Name = "RemoveToolStripMenuItem"
-        Me.RemoveToolStripMenuItem.Size = New System.Drawing.Size(92, 22)
-        Me.RemoveToolStripMenuItem.Text = "Remove"
+        Me.tbtnSettings.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.tbtnSettings.Image = Global.Enid.My.Resources.Resources.cog
+        Me.tbtnSettings.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.tbtnSettings.Name = "tbtnSettings"
+        Me.tbtnSettings.Size = New System.Drawing.Size(23, 22)
+        Me.tbtnSettings.Text = "Settings"
         '
         'frmMain
         '
@@ -117,23 +105,23 @@ Partial Class frmMain
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(492, 307)
-        Me.Controls.Add(Me.ToolStrip1)
+        Me.Controls.Add(Me.tsMain)
         Me.Name = "frmMain"
         Me.Text = "Enid"
-        Me.ContextMenuStrip1.ResumeLayout(False)
+        Me.tsMain.ResumeLayout(False)
+        Me.tsMain.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
-    Friend WithEvents ToolStripButton1 As System.Windows.Forms.ToolStripButton
-    Friend WithEvents ToolStripButton2 As System.Windows.Forms.ToolStripButton
-    Friend WithEvents ToolStripSeparator3 As System.Windows.Forms.ToolStripSeparator
-    Friend WithEvents ToolStripButton3 As System.Windows.Forms.ToolStripButton
-    Friend WithEvents ToolStripSeparator4 As System.Windows.Forms.ToolStripSeparator
-    Friend WithEvents ImageList1 As System.Windows.Forms.ImageList
-    Friend WithEvents ContextMenuStrip1 As System.Windows.Forms.ContextMenuStrip
-    Friend WithEvents RemoveToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents RenameToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents tsMain As System.Windows.Forms.ToolStrip
+    Friend WithEvents csButtons As System.Windows.Forms.ContextMenuStrip
+    Friend WithEvents csitemRemove As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents csitemRename As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents tbtnLock As System.Windows.Forms.ToolStripButton
+    Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents tbtnSave As System.Windows.Forms.ToolStripButton
+    Friend WithEvents ToolStripSeparator2 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents tbtnSettings As System.Windows.Forms.ToolStripButton
 
 End Class
