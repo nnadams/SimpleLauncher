@@ -6,16 +6,20 @@ Public Class frmMain
     Public lastPoint As Point = New Point(-1, -1)
     Public tmpControl As MagicControl
 
-    'Private datFile As String = My.Application.Info.DirectoryPath.ToString() & "\Enid.dat"
-    Private datFile As String = "C:\Users\Nick\Desktop\Enid.dat" ' TODO: Remove for release!
+    Private datFile As String = My.Application.Info.DirectoryPath.ToString() & "\Enid.dat"
 
     Public Sub Button_MouseDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs)
         Dim activeButton As New Button
         activeButton = sender
 
         If isLocked And e.Button = Windows.Forms.MouseButtons.Left Then
-            If activeButton.Tag = "" Or dialogSettings.openDialog.FileName = "" Then Exit Sub
-            Process.Start(dialogSettings.openDialog.FileName, Chr(34) & activeButton.Tag & Chr(34))
+            If activeButton.Tag = "" Then
+                MsgBox("There was an error accessing data. Please remove and reimport this file.", MsgBoxStyle.Critical)
+            ElseIf dialogSettings.openDialog.FileName = "" Then
+                MsgBox("Please choose an application to launch with.", MsgBoxStyle.Exclamation)
+            Else
+                Process.Start(dialogSettings.openDialog.FileName, Chr(34) & activeButton.Tag & Chr(34))
+            End If
         End If
     End Sub
 
@@ -69,7 +73,7 @@ Public Class frmMain
                     newButton.Text = buffer
                     newButton.ContextMenuStrip = csButtons
 
-                    newButton.Location = GetNextLocation(lastPoint, dialogSettings.numCols.Value, dialogSettings.numRows.Value, newButton.Width + 10, newButton.Height + 10)
+                    newButton.Location = GetNextFixedLocation(lastPoint, dialogSettings.numCols.Value, dialogSettings.numRows.Value, newButton.Width + 10, newButton.Height + 10)
                     lastPoint = newButton.Location
                     newButton.Tag = file
 
@@ -123,10 +127,7 @@ Public Class frmMain
     End Sub
 
     Private Sub frmMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        If Not My.Computer.FileSystem.FileExists(datFile) Then
-            dialogAdd.ShowDialog()
-            Exit Sub
-        End If
+        If Not My.Computer.FileSystem.FileExists(datFile) Then Exit Sub
 
         Dim sreader As New StreamReader(datFile)
         Dim line As String

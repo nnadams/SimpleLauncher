@@ -2,10 +2,13 @@
 
 Public Class diaAdd
 
+    Private nextState As CheckState = CheckState.Indeterminate
+
     Private Sub btnImport_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnImport.Click
         If rbtnGrid.Checked Then
-            For Each item As ListViewItem In lvMain.Items
-                If Not item.Checked Then Continue For
+            Dim tableLoc As New Point(0, 0)
+            Dim oldButton As Button = New Button()
+            For Each item As ListViewItem In lvMain.CheckedItems
 
                 Dim label As String = item.Text
                 Dim path As String = item.SubItems.Item(1).Text
@@ -13,20 +16,28 @@ Public Class diaAdd
                 If My.Computer.FileSystem.FileExists(path) Then
                     Dim newButton As New Button
 
-                    frmMain.lastPoint = newButton.Location
                     newButton.Tag = path
                     newButton.Text = label
                     newButton.ContextMenuStrip = frmMain.csButtons
-                    newButton.Location = GetNextLocation(frmMain.lastPoint, numCols.Value, numRows.Value, newButton.Width + 10, newButton.Height + 10)
+                    newButton.Width = GetWidth(label)
+                    newButton.Location = GetNextLocation(frmMain.lastPoint, tableLoc, numCols.Value, numRows.Value, oldButton.Width + 10, oldButton.Height + 10)
+                    frmMain.lastPoint = newButton.Location
 
                     AddHandler newButton.MouseDown, AddressOf frmMain.Button_MouseDown
                     frmMain.Controls.Add(newButton)
                     frmMain.tmpControl = New MagicControl(newButton)
+                    oldButton = newButton
                 Else
                     MsgBox("Skipping the adding of" & vbCrLf & "'" & label & "'" & vbCrLf & "because it could not be found!", MsgBoxStyle.Exclamation)
                 End If
+                pbarImport.Value = IIf(pbarImport.Value + (100 / lvMain.CheckedItems.Count) > 100, 100, pbarImport.Value + (100 / lvMain.CheckedItems.Count))
             Next
             lvMain.Items.Clear()
+            lblCount.Text = ""
+            numCols.Value = 10
+            numRows.Value = 10
+            pbarImport.Value = 0
+
             Me.DialogResult = System.Windows.Forms.DialogResult.OK
             Me.Close()
         ElseIf rbtnManual.Checked Then
@@ -37,18 +48,20 @@ Public Class diaAdd
 
             dialogList.Location = New Point(frmMain.Location.X + frmMain.Width + 5, frmMain.Location.Y + 5)
             dialogList.Show(frmMain)
-            For Each item As ListViewItem In lvMain.Items
-                If Not item.Checked Then Continue For
-
+            For Each item As ListViewItem In lvMain.CheckedItems
                 Dim label As String = item.Text
                 Dim path As String = item.SubItems.Item(1).Text
-
                 Dim newItem As New ListViewItem(label)
+
                 newItem.Tag = path
                 dialogList.lvChoosen.Items.Add(newItem)
             Next
             dialogList.lvChoosen.Items(0).Selected = True
             lvMain.Items.Clear()
+            lblCount.Text = ""
+            numCols.Value = 10
+            numRows.Value = 10
+            pbarImport.Value = 0
 
             frmMain.Focus()
             Me.Close()
@@ -56,6 +69,12 @@ Public Class diaAdd
     End Sub
 
     Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
+        lvMain.Items.Clear()
+        lblCount.Text = ""
+        numCols.Value = 10
+        numRows.Value = 10
+        pbarImport.Value = 0
+
         Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.Close()
     End Sub
@@ -75,6 +94,8 @@ Public Class diaAdd
                 lvItem.Checked = True
                 lvMain.Items.Add(lvItem)
             Next
+            numRows_ValueChanged(sender, e)
+            UpdateLabel()
         End If
     End Sub
 
@@ -110,6 +131,8 @@ Public Class diaAdd
                 lvItem.Checked = True
                 lvMain.Items.Add(lvItem)
             Next
+            UpdateLabel()
+            numRows_ValueChanged(sender, e)
         End If
     End Sub
 
@@ -118,6 +141,65 @@ Public Class diaAdd
             For Each item As ListViewItem In lvMain.SelectedItems
                 lvMain.Items.Remove(item)
             Next
+            UpdateLabel()
         End If
+    End Sub
+
+    Private Sub numCols_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles numCols.ValueChanged
+        Dim realItems As Integer = lvMain.CheckedItems.Count
+        Select Case nextState
+            Case CheckState.Checked
+                realItems += 1
+            Case CheckState.Unchecked
+                realItems -= 1
+        End Select
+
+        Do While (numCols.Value * numRows.Value) < realItems
+            numCols.Value = Math.Floor(Math.Sqrt(realItems))
+            If (numCols.Value * numRows.Value) >= realItems Then Exit Do
+            numRows.Value = Math.Ceiling(Math.Sqrt(realItems))
+            If (numCols.Value * numRows.Value) < realItems Then
+                numRows.Value += 1
+            End If
+        Loop
+        nextState = CheckState.Indeterminate
+    End Sub
+
+    Private Sub numRows_ValueChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles numRows.ValueChanged
+        Dim realItems As Integer = lvMain.CheckedItems.Count
+        Select Case nextState
+            Case CheckState.Checked
+                realItems += 1
+            Case CheckState.Unchecked
+                realItems -= 1
+        End Select
+
+        Do While (numCols.Value * numRows.Value) < realItems
+            numRows.Value = Math.Floor(Math.Sqrt(realItems))
+            If (numCols.Value * numRows.Value) >= realItems Then Exit Do
+            numCols.Value = Math.Ceiling(Math.Sqrt(realItems))
+            If (numCols.Value * numRows.Value) < realItems Then
+                numCols.Value += 1
+            End If
+        Loop
+        nextState = CheckState.Indeterminate
+    End Sub
+
+    Private Sub lvMain_ItemCheck(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs) Handles lvMain.ItemCheck
+        nextState = e.NewValue
+        UpdateLabel()
+        numRows_ValueChanged(sender, e)
+    End Sub
+
+    Private Sub UpdateLabel()
+        Dim totalItems As Integer = lvMain.Items.Count
+        Dim realItems As Integer = lvMain.CheckedItems.Count
+        Select Case nextState
+            Case CheckState.Checked
+                realItems += 1
+            Case CheckState.Unchecked
+                realItems -= 1
+        End Select
+        lblCount.Text = IIf(totalItems > 0, realItems.ToString & "/" & totalItems.ToString, "")
     End Sub
 End Class
