@@ -64,6 +64,10 @@ Partial Class diaSettings
         Me.btnOpen.Text = "..."
         Me.btnOpen.UseVisualStyleBackColor = True
         '
+        'openDialog
+        '
+        Me.openDialog.Title = "Choose a Program - Enid"
+        '
         'gbAuto
         '
         Me.gbAuto.Controls.Add(Me.numRows)
@@ -139,8 +143,7 @@ Partial Class diaSettings
         Me.Controls.Add(Me.gbAuto)
         Me.Controls.Add(Me.btnOpen)
         Me.Controls.Add(Me.lblProgram)
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
-        Me.HelpButton = True
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "diaSettings"

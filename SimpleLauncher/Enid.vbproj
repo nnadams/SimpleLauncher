@@ -83,6 +83,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="diaAdd.Designer.vb">
+      <DependentUpon>diaAdd.vb</DependentUpon>
+    </Compile>
+    <Compile Include="diaAdd.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="diaList.Designer.vb">
+      <DependentUpon>diaList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="diaList.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="diaSettings.Designer.vb">
       <DependentUpon>diaSettings.vb</DependentUpon>
     </Compile>
@@ -96,6 +108,7 @@
       <DependentUpon>frmMain.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Functions.vb" />
     <Compile Include="MagicControl.vb">
       <SubType>Component</SubType>
     </Compile>
@@ -122,6 +135,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="diaAdd.resx">
+      <DependentUpon>diaAdd.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="diaList.resx">
+      <DependentUpon>diaList.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="diaSettings.resx">
       <DependentUpon>diaSettings.vb</DependentUpon>
     </EmbeddedResource>
@@ -195,7 +214,13 @@
     <None Include="Resources\cog.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\drive_delete.png" />
+    <None Include="Resources\add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\page_add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\page_delete.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -24,43 +24,27 @@ Partial Class frmMain
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
         Me.tsMain = New System.Windows.Forms.ToolStrip
+        Me.tbtnLock = New System.Windows.Forms.ToolStripButton
+        Me.tsSep1 = New System.Windows.Forms.ToolStripSeparator
+        Me.tbtnAdd = New System.Windows.Forms.ToolStripButton
+        Me.tbtnSave = New System.Windows.Forms.ToolStripButton
+        Me.tsSep2 = New System.Windows.Forms.ToolStripSeparator
+        Me.tbtnSettings = New System.Windows.Forms.ToolStripButton
         Me.csButtons = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.csitemRename = New System.Windows.Forms.ToolStripMenuItem
         Me.csitemRemove = New System.Windows.Forms.ToolStripMenuItem
-        Me.tbtnLock = New System.Windows.Forms.ToolStripButton
-        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
-        Me.tbtnSave = New System.Windows.Forms.ToolStripButton
-        Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator
-        Me.tbtnSettings = New System.Windows.Forms.ToolStripButton
         Me.tsMain.SuspendLayout()
+        Me.csButtons.SuspendLayout()
         Me.SuspendLayout()
         '
         'tsMain
         '
         Me.tsMain.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        Me.tsMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tbtnLock, Me.ToolStripSeparator1, Me.tbtnSave, Me.ToolStripSeparator2, Me.tbtnSettings})
+        Me.tsMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tbtnLock, Me.tsSep1, Me.tbtnAdd, Me.tbtnSave, Me.tsSep2, Me.tbtnSettings})
         Me.tsMain.Location = New System.Drawing.Point(0, 0)
         Me.tsMain.Name = "tsMain"
         Me.tsMain.Size = New System.Drawing.Size(492, 25)
         Me.tsMain.TabIndex = 1
-        '
-        'csButtons
-        '
-        Me.csButtons.Name = "ContextMenuStrip1"
-        Me.csButtons.ShowImageMargin = False
-        Me.csButtons.Size = New System.Drawing.Size(36, 4)
-        '
-        'csitemRename
-        '
-        Me.csitemRename.Name = "csitemRename"
-        Me.csitemRename.Size = New System.Drawing.Size(92, 22)
-        Me.csitemRename.Text = "Rename"
-        '
-        'csitemRemove
-        '
-        Me.csitemRemove.Name = "csitemRemove"
-        Me.csitemRemove.Size = New System.Drawing.Size(127, 22)
-        Me.csitemRemove.Text = "Remove"
         '
         'tbtnLock
         '
@@ -71,10 +55,19 @@ Partial Class frmMain
         Me.tbtnLock.Size = New System.Drawing.Size(23, 22)
         Me.tbtnLock.Text = "Lock/Unlock"
         '
-        'ToolStripSeparator1
+        'tsSep1
         '
-        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(6, 25)
+        Me.tsSep1.Name = "tsSep1"
+        Me.tsSep1.Size = New System.Drawing.Size(6, 25)
+        '
+        'tbtnAdd
+        '
+        Me.tbtnAdd.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.tbtnAdd.Image = Global.Enid.My.Resources.Resources.add
+        Me.tbtnAdd.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.tbtnAdd.Name = "tbtnAdd"
+        Me.tbtnAdd.Size = New System.Drawing.Size(23, 22)
+        Me.tbtnAdd.Text = "Import"
         '
         'tbtnSave
         '
@@ -85,10 +78,10 @@ Partial Class frmMain
         Me.tbtnSave.Size = New System.Drawing.Size(23, 22)
         Me.tbtnSave.Text = "Save"
         '
-        'ToolStripSeparator2
+        'tsSep2
         '
-        Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-        Me.ToolStripSeparator2.Size = New System.Drawing.Size(6, 25)
+        Me.tsSep2.Name = "tsSep2"
+        Me.tsSep2.Size = New System.Drawing.Size(6, 25)
         '
         'tbtnSettings
         '
@@ -98,6 +91,25 @@ Partial Class frmMain
         Me.tbtnSettings.Name = "tbtnSettings"
         Me.tbtnSettings.Size = New System.Drawing.Size(23, 22)
         Me.tbtnSettings.Text = "Settings"
+        '
+        'csButtons
+        '
+        Me.csButtons.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.csitemRename, Me.csitemRemove})
+        Me.csButtons.Name = "csButtons"
+        Me.csButtons.ShowImageMargin = False
+        Me.csButtons.Size = New System.Drawing.Size(93, 48)
+        '
+        'csitemRename
+        '
+        Me.csitemRename.Name = "csitemRename"
+        Me.csitemRename.Size = New System.Drawing.Size(92, 22)
+        Me.csitemRename.Text = "Rename"
+        '
+        'csitemRemove
+        '
+        Me.csitemRemove.Name = "csitemRemove"
+        Me.csitemRemove.Size = New System.Drawing.Size(92, 22)
+        Me.csitemRemove.Text = "Remove"
         '
         'frmMain
         '
@@ -110,18 +122,20 @@ Partial Class frmMain
         Me.Text = "Enid"
         Me.tsMain.ResumeLayout(False)
         Me.tsMain.PerformLayout()
+        Me.csButtons.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
     Friend WithEvents tsMain As System.Windows.Forms.ToolStrip
     Friend WithEvents csButtons As System.Windows.Forms.ContextMenuStrip
-    Friend WithEvents csitemRemove As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents csitemRename As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents tbtnLock As System.Windows.Forms.ToolStripButton
-    Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents tsSep1 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents tbtnSave As System.Windows.Forms.ToolStripButton
-    Friend WithEvents ToolStripSeparator2 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents tsSep2 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents tbtnSettings As System.Windows.Forms.ToolStripButton
+    Friend WithEvents tbtnAdd As System.Windows.Forms.ToolStripButton
+    Friend WithEvents csitemRename As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents csitemRemove As System.Windows.Forms.ToolStripMenuItem
 
 End Class
