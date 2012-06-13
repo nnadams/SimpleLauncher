@@ -40,9 +40,9 @@ Partial Class diaAdd
         Me.rbtnManual = New System.Windows.Forms.RadioButton
         Me.btnSelectAll = New System.Windows.Forms.Button
         Me.btnSelectNone = New System.Windows.Forms.Button
+        Me.lblCount = New System.Windows.Forms.Label
         Me.btnRemove = New System.Windows.Forms.Button
         Me.btnOpen = New System.Windows.Forms.Button
-        Me.lblCount = New System.Windows.Forms.Label
         Me.layoutPanel.SuspendLayout()
         CType(Me.numRows, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.numCols, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -55,7 +55,7 @@ Partial Class diaAdd
         Me.layoutPanel.ColumnCount = 3
         Me.layoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 87.04762!))
         Me.layoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.95238!))
-        Me.layoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 67.0!))
+        Me.layoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 74.0!))
         Me.layoutPanel.Controls.Add(Me.btnCancel, 2, 0)
         Me.layoutPanel.Controls.Add(Me.btnImport, 1, 0)
         Me.layoutPanel.Controls.Add(Me.pbarImport, 0, 0)
@@ -70,7 +70,7 @@ Partial Class diaAdd
         '
         Me.btnCancel.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(556, 3)
+        Me.btnCancel.Location = New System.Drawing.Point(553, 3)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(61, 23)
         Me.btnCancel.TabIndex = 1
@@ -79,9 +79,9 @@ Partial Class diaAdd
         'btnImport
         '
         Me.btnImport.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.btnImport.Location = New System.Drawing.Point(485, 3)
+        Me.btnImport.Location = New System.Drawing.Point(479, 3)
         Me.btnImport.Name = "btnImport"
-        Me.btnImport.Size = New System.Drawing.Size(65, 23)
+        Me.btnImport.Size = New System.Drawing.Size(64, 23)
         Me.btnImport.TabIndex = 0
         Me.btnImport.Text = "Import"
         '
@@ -89,7 +89,7 @@ Partial Class diaAdd
         '
         Me.pbarImport.Location = New System.Drawing.Point(3, 3)
         Me.pbarImport.Name = "pbarImport"
-        Me.pbarImport.Size = New System.Drawing.Size(476, 23)
+        Me.pbarImport.Size = New System.Drawing.Size(470, 23)
         Me.pbarImport.Style = System.Windows.Forms.ProgressBarStyle.Continuous
         Me.pbarImport.TabIndex = 2
         '
@@ -168,7 +168,7 @@ Partial Class diaAdd
         Me.gbGrid.Controls.Add(Me.numRows)
         Me.gbGrid.Controls.Add(Me.numCols)
         Me.gbGrid.Controls.Add(Me.lblRows)
-        Me.gbGrid.Location = New System.Drawing.Point(282, 415)
+        Me.gbGrid.Location = New System.Drawing.Point(276, 415)
         Me.gbGrid.Name = "gbGrid"
         Me.gbGrid.Size = New System.Drawing.Size(201, 40)
         Me.gbGrid.TabIndex = 9
@@ -215,6 +215,15 @@ Partial Class diaAdd
         Me.btnSelectNone.Text = "Select None"
         Me.btnSelectNone.UseVisualStyleBackColor = True
         '
+        'lblCount
+        '
+        Me.lblCount.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblCount.Location = New System.Drawing.Point(566, 429)
+        Me.lblCount.Name = "lblCount"
+        Me.lblCount.Size = New System.Drawing.Size(60, 15)
+        Me.lblCount.TabIndex = 13
+        Me.lblCount.TextAlign = System.Drawing.ContentAlignment.TopRight
+        '
         'btnRemove
         '
         Me.btnRemove.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -236,15 +245,6 @@ Partial Class diaAdd
         Me.btnOpen.TabIndex = 8
         Me.btnOpen.TextAlign = System.Drawing.ContentAlignment.TopCenter
         Me.btnOpen.UseVisualStyleBackColor = True
-        '
-        'lblCount
-        '
-        Me.lblCount.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblCount.Location = New System.Drawing.Point(566, 429)
-        Me.lblCount.Name = "lblCount"
-        Me.lblCount.Size = New System.Drawing.Size(60, 15)
-        Me.lblCount.TabIndex = 13
-        Me.lblCount.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'diaAdd
         '

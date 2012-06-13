@@ -22,6 +22,9 @@ Public Class diaAdd
                     newButton.Width = GetWidth(label)
                     newButton.Location = GetNextLocation(frmMain.lastPoint, tableLoc, numCols.Value, numRows.Value, oldButton.Width + 10, oldButton.Height + 10)
                     frmMain.lastPoint = newButton.Location
+                    newButton.FlatStyle = FlatStyle.Popup
+                    newButton.BackColor = Color.FromArgb(120, 120, 190)
+                    newButton.ForeColor = Color.White
 
                     AddHandler newButton.MouseDown, AddressOf frmMain.Button_MouseDown
                     frmMain.Controls.Add(newButton)
@@ -201,5 +204,11 @@ Public Class diaAdd
                 realItems -= 1
         End Select
         lblCount.Text = IIf(totalItems > 0, realItems.ToString & "/" & totalItems.ToString, "")
+    End Sub
+
+    Private Sub lvMain_KeyDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles lvMain.KeyDown
+        If e.KeyCode = Keys.F2 And lvMain.SelectedItems.Count = 1 Then
+            lvMain.SelectedItems.Item(0).BeginEdit()
+        End If
     End Sub
 End Class

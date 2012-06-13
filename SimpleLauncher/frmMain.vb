@@ -6,6 +6,7 @@ Public Class frmMain
     Public lastPoint As Point = New Point(-1, -1)
     Public tmpControl As MagicControl
 
+    Private isLit As Boolean = True
     Private datFile As String = My.Application.Info.DirectoryPath.ToString() & "\Enid.dat"
 
     Public Sub Button_MouseDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs)
@@ -76,6 +77,9 @@ Public Class frmMain
                     newButton.Location = GetNextFixedLocation(lastPoint, dialogSettings.numCols.Value, dialogSettings.numRows.Value, newButton.Width + 10, newButton.Height + 10)
                     lastPoint = newButton.Location
                     newButton.Tag = file
+                    newButton.FlatStyle = FlatStyle.Popup
+                    newButton.BackColor = Color.FromArgb(120, 120, 190)
+                    newButton.ForeColor = Color.White
 
                     AddHandler newButton.MouseDown, AddressOf Button_MouseDown
                     Me.Controls.Add(newButton)
@@ -155,6 +159,10 @@ Public Class frmMain
                     newButton.Tag = buffer(0)
                     newButton.Text = buffer(1)
                     newButton.ContextMenuStrip = csButtons
+                    newButton.FlatStyle = FlatStyle.Popup
+                    newButton.BackColor = Color.FromArgb(120, 120, 190)
+                    newButton.ForeColor = Color.White
+
                     AddHandler newButton.MouseDown, AddressOf Button_MouseDown
                     Me.Controls.Add(newButton)
                     tmpControl = New MagicControl(newButton)
@@ -189,6 +197,9 @@ Public Class frmMain
         newButton.Width = GetWidth(curItem.Text)
         newButton.Location = New Point(e.X - (newButton.Width / 2), e.Y - (newButton.Height / 2))
         newButton.ContextMenuStrip = csButtons
+        newButton.FlatStyle = FlatStyle.Popup
+        newButton.BackColor = Color.FromArgb(120, 120, 190)
+        newButton.ForeColor = Color.White
         AddHandler newButton.MouseDown, AddressOf Button_MouseDown
         Me.Controls.Add(newButton)
         tmpControl = New MagicControl(newButton)
@@ -199,6 +210,20 @@ Public Class frmMain
             Me.Cursor = Cursors.Default
         Else
             dialogList.lvChoosen.Items(0).Selected = True
+        End If
+    End Sub
+
+    Private Sub tbtnLight_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbtnLight.Click
+        If isLit Then
+            tsMain.BackgroundImage = My.Resources.background
+            Me.BackColor = Color.FromArgb(255, 67, 78, 84)
+            tbtnLight.Image = My.Resources.lightbulb_off
+            isLit = False
+        Else
+            tsMain.BackgroundImage = Nothing
+            Me.BackColor = Color.FromArgb(255, 240, 240, 240)
+            tbtnLight.Image = My.Resources.lightbulb
+            isLit = True
         End If
     End Sub
 End Class

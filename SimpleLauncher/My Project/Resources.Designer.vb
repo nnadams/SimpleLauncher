@@ -67,6 +67,13 @@ Namespace My.Resources
             End Get
         End Property
         
+        Friend ReadOnly Property background() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("background", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
         Friend ReadOnly Property cog() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("cog", resourceCulture)
@@ -77,6 +84,20 @@ Namespace My.Resources
         Friend ReadOnly Property disk() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("disk", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        Friend ReadOnly Property lightbulb() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("lightbulb", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        Friend ReadOnly Property lightbulb_off() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("lightbulb_off", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
