@@ -4,9 +4,12 @@ Imports System.Text
 Public Class frmMain
     Public isLocked As Boolean = False
     Public lastPoint As Point = New Point(-1, -1)
+    Public lastSize As Size = New Size(-1, -1)
+    Public tableLoc As Point = New Point(1, 1)
     Public tmpControl As MagicControl
 
     Private isLit As Boolean = True
+    Private isFullScreen As Boolean = False
     Private datFile As String = My.Application.Info.DirectoryPath.ToString() & "\Enid.dat"
 
     Public Sub Button_MouseDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs)
@@ -46,19 +49,11 @@ Public Class frmMain
         strip = control.Owner
         activeButton = strip.SourceControl
         If MsgBox("Really delete '" & activeButton.Text & "'?", MsgBoxStyle.YesNo, "Delete?") = MsgBoxResult.Yes Then
-            Me.Controls.Remove(activeButton)
+            splitMain.Panel1.Controls.Remove(activeButton)
         End If
     End Sub
 
-    Private Sub frmMain_DragEnter(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles MyBase.DragEnter
-        If e.Data.GetDataPresent(DataFormats.FileDrop) And dialogSettings.chkEnAuto.Checked = True Then
-            e.Effect = DragDropEffects.Copy
-        Else
-            e.Effect = DragDropEffects.None
-        End If
-    End Sub
-
-    Private Sub frmMain_DragDrop(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles MyBase.DragDrop
+    Private Sub frmMain_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles Me.DragDrop
         If e.Data.GetDataPresent(DataFormats.FileDrop) Then
             Dim filePaths As String() = CType(e.Data.GetData(DataFormats.FileDrop), String())
 
@@ -71,23 +66,34 @@ Public Class frmMain
                 If My.Computer.FileSystem.FileExists(file) Then
                     Dim newButton As New Button
                     Dim buffer As String = RemovePath(file)
+
+                    newButton.AutoSize = True
                     newButton.Text = buffer
                     newButton.ContextMenuStrip = csButtons
-
-                    newButton.Location = GetNextFixedLocation(lastPoint, dialogSettings.numCols.Value, dialogSettings.numRows.Value, newButton.Width + 10, newButton.Height + 10)
-                    lastPoint = newButton.Location
                     newButton.Tag = file
                     newButton.FlatStyle = FlatStyle.Popup
                     newButton.BackColor = Color.FromArgb(120, 120, 190)
                     newButton.ForeColor = Color.White
 
                     AddHandler newButton.MouseDown, AddressOf Button_MouseDown
-                    Me.Controls.Add(newButton)
+                    splitMain.Panel1.Controls.Add(newButton)
+                    newButton.Location = GetNextLocation(lastPoint, tableLoc, dialogSettings.numCols.Value, dialogSettings.numRows.Value, lastSize)
+                    lastSize = newButton.Size
+                    lastPoint = newButton.Location
+
                     tmpControl = New MagicControl(newButton)
                 Else
                     MsgBox("Skipping the adding of" & vbCrLf & "'" & file & "'" & vbCrLf & "because it could not be found!", MsgBoxStyle.Exclamation)
                 End If
             Next file
+        End If
+    End Sub
+
+    Private Sub frmMain_DragEnter(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles Me.DragEnter
+        If e.Data.GetDataPresent(DataFormats.FileDrop) And dialogSettings.chkEnAuto.Checked = True Then
+            e.Effect = DragDropEffects.Copy
+        Else
+            e.Effect = DragDropEffects.None
         End If
     End Sub
 
@@ -110,15 +116,17 @@ Public Class frmMain
     End Sub
 
     Private Sub tbtnSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbtnSave.Click
-        Me.Cursor = Cursors.WaitCursor
+        splitMain.Panel1.Cursor = Cursors.WaitCursor
         With My.Computer.FileSystem
             .WriteAllText(datFile, dialogSettings.numCols.Value.ToString & vbCrLf, False)
             .WriteAllText(datFile, dialogSettings.numRows.Value.ToString & vbCrLf, True)
             .WriteAllText(datFile, dialogSettings.chkEnAuto.Checked.ToString & vbCrLf, True)
             .WriteAllText(datFile, dialogSettings.openDialog.FileName & vbCrLf, True)
+            .WriteAllText(datFile, lastPoint.X & "|" & lastPoint.Y & vbCrLf, True)
+            .WriteAllText(datFile, lastSize.Width & "|" & lastSize.Height & vbCrLf, True)
 
             On Error Resume Next
-            For Each control As Button In Me.Controls
+            For Each control As Button In splitMain.Panel1.Controls
                 .WriteAllText(datFile, control.Tag & "|" & _
                               control.Text & "|" & _
                               control.Location.X & "|" & _
@@ -127,7 +135,7 @@ Public Class frmMain
                               control.Height & vbCrLf, True)
             Next
         End With
-        Me.Cursor = Cursors.Default
+        splitMain.Panel1.Cursor = Cursors.Default
     End Sub
 
     Private Sub frmMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
@@ -149,6 +157,14 @@ Public Class frmMain
                     If line = "True" Then dialogSettings.chkEnAuto.Checked = True
                 Case 3
                     dialogSettings.openDialog.FileName = line
+                Case 4
+                    buffer = Split(line, "|")
+                    lastPoint.X = CInt(buffer(0))
+                    lastPoint.Y = CInt(buffer(1))
+                Case 5
+                    buffer = Split(line, "|")
+                    lastSize.Width = CInt(buffer(0))
+                    lastSize.Height = CInt(buffer(1))
                 Case Else
                     If line = "" Then Exit Do
                     buffer = Split(line, "|")
@@ -164,9 +180,8 @@ Public Class frmMain
                     newButton.ForeColor = Color.White
 
                     AddHandler newButton.MouseDown, AddressOf Button_MouseDown
-                    Me.Controls.Add(newButton)
+                    splitMain.Panel1.Controls.Add(newButton)
                     tmpControl = New MagicControl(newButton)
-                    lastPoint = newButton.Location
             End Select
             curline += 1
         Loop
@@ -180,8 +195,8 @@ Public Class frmMain
         End If
     End Sub
 
-    Private Sub frmMain_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseClick
-        If Me.Cursor <> Cursors.Cross Or e.Button <> Windows.Forms.MouseButtons.Left Then Exit Sub
+    Private Sub splitMain_Panel1_Click(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles splitMain.Panel1.Click
+        If splitMain.Panel1.Cursor <> Cursors.Cross Or e.Button <> Windows.Forms.MouseButtons.Left Then Exit Sub
 
         Dim newButton As New Button
         Dim curItem As ListViewItem
@@ -194,36 +209,50 @@ Public Class frmMain
 
         newButton.Text = curItem.Text
         newButton.Tag = curItem.Tag
-        newButton.Width = GetWidth(curItem.Text)
-        newButton.Location = New Point(e.X - (newButton.Width / 2), e.Y - (newButton.Height / 2))
+        newButton.AutoSize = True
         newButton.ContextMenuStrip = csButtons
         newButton.FlatStyle = FlatStyle.Popup
         newButton.BackColor = Color.FromArgb(120, 120, 190)
         newButton.ForeColor = Color.White
         AddHandler newButton.MouseDown, AddressOf Button_MouseDown
-        Me.Controls.Add(newButton)
+        splitMain.Panel1.Controls.Add(newButton)
+        newButton.Location = New Point(e.X - (newButton.Width / 2), e.Y - (newButton.Height / 2))
         tmpControl = New MagicControl(newButton)
 
         dialogList.lvChoosen.Items.Remove(curItem)
         If dialogList.lvChoosen.Items.Count = 0 Then
             dialogList.Close()
-            Me.Cursor = Cursors.Default
+            splitMain.Panel1.Cursor = Cursors.Default
         Else
             dialogList.lvChoosen.Items(0).Selected = True
         End If
     End Sub
 
-    Private Sub tbtnLight_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbtnLight.Click
-        If isLit Then
-            tsMain.BackgroundImage = My.Resources.background
-            Me.BackColor = Color.FromArgb(255, 67, 78, 84)
-            tbtnLight.Image = My.Resources.lightbulb_off
-            isLit = False
-        Else
-            tsMain.BackgroundImage = Nothing
-            Me.BackColor = Color.FromArgb(255, 240, 240, 240)
-            tbtnLight.Image = My.Resources.lightbulb
-            isLit = True
+    Private Sub frmMain_KeyDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+        If e.KeyCode = Keys.F11 Then
+            If isFullScreen Then
+                toNormal()
+            Else
+                toFullScreen()
+            End If
         End If
+    End Sub
+
+    Private Sub toNormal()
+        Me.FormBorderStyle = Windows.Forms.FormBorderStyle.Sizable
+        Me.WindowState = FormWindowState.Normal
+        Me.TopMost = False
+        isFullScreen = False
+    End Sub
+
+    Private Sub toFullScreen()
+        Me.FormBorderStyle = Windows.Forms.FormBorderStyle.None
+        Me.WindowState = FormWindowState.Maximized
+        Me.TopMost = True
+        isFullScreen = True
+    End Sub
+
+    Private Sub splitMain_SplitterMoved(ByVal sender As System.Object, ByVal e As System.Windows.Forms.SplitterEventArgs) Handles splitMain.SplitterMoved
+        Me.ActiveControl = Nothing
     End Sub
 End Class

@@ -6,8 +6,6 @@ Public Class diaAdd
 
     Private Sub btnImport_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnImport.Click
         If rbtnGrid.Checked Then
-            Dim tableLoc As New Point(0, 0)
-            Dim oldButton As Button = New Button()
             For Each item As ListViewItem In lvMain.CheckedItems
 
                 Dim label As String = item.Text
@@ -19,17 +17,17 @@ Public Class diaAdd
                     newButton.Tag = path
                     newButton.Text = label
                     newButton.ContextMenuStrip = frmMain.csButtons
-                    newButton.Width = GetWidth(label)
-                    newButton.Location = GetNextLocation(frmMain.lastPoint, tableLoc, numCols.Value, numRows.Value, oldButton.Width + 10, oldButton.Height + 10)
-                    frmMain.lastPoint = newButton.Location
+                    newButton.AutoSize = True
                     newButton.FlatStyle = FlatStyle.Popup
                     newButton.BackColor = Color.FromArgb(120, 120, 190)
                     newButton.ForeColor = Color.White
 
                     AddHandler newButton.MouseDown, AddressOf frmMain.Button_MouseDown
-                    frmMain.Controls.Add(newButton)
+                    frmMain.splitMain.Panel1.Controls.Add(newButton)
+                    newButton.Location = GetNextLocation(frmMain.lastPoint, frmMain.tableLoc, numCols.Value, numRows.Value, frmMain.lastSize)
+                    frmMain.lastSize = newButton.Size
+                    frmMain.lastPoint = newButton.Location
                     frmMain.tmpControl = New MagicControl(newButton)
-                    oldButton = newButton
                 Else
                     MsgBox("Skipping the adding of" & vbCrLf & "'" & label & "'" & vbCrLf & "because it could not be found!", MsgBoxStyle.Exclamation)
                 End If
@@ -47,7 +45,7 @@ Public Class diaAdd
             Me.DialogResult = System.Windows.Forms.DialogResult.OK
             Me.Hide()
 
-            frmMain.Cursor = Cursors.Cross
+            frmMain.splitMain.Panel1.Cursor = Cursors.Cross
 
             dialogList.Location = New Point(frmMain.Location.X + frmMain.Width + 5, frmMain.Location.Y + 5)
             dialogList.Show(frmMain)
@@ -66,7 +64,7 @@ Public Class diaAdd
             numRows.Value = 10
             pbarImport.Value = 0
 
-            frmMain.Focus()
+            frmMain.splitMain.Panel1.Focus()
             Me.Close()
         End If
     End Sub

@@ -14,34 +14,28 @@ Module Functions
         End If
     End Function
 
-    Public Function GetNextLocation(ByVal curLoc As Point, ByRef tableLoc As Point, ByVal cols As Integer, ByVal rows As Integer, ByVal width As Integer, ByVal height As Integer) As Point
+    Public Function GetNextLocation(ByVal curLoc As Point, ByRef tableLoc As Point, ByVal cols As Integer, ByVal rows As Integer, ByVal size As Size) As Point
         Dim x As Integer = curLoc.X
         Dim y As Integer = curLoc.Y
 
         If x = -1 And y = -1 Then
-            Return New Point(0, 25)
+            Return New Point(2, 2)
         Else
             If tableLoc.X < cols Then
                 tableLoc.X += 1
-                Return New Point(curLoc.X + width, curLoc.Y)
+                Return New Point(curLoc.X + size.Width + 10, curLoc.Y)
             ElseIf tableLoc.X = cols And tableLoc.Y < rows Then
-                tableLoc.X = 0
+                tableLoc.X = 1
                 tableLoc.Y += 1
-                Return New Point(0, curLoc.Y + height)
+                Return New Point(2, curLoc.Y + size.Height + 10)
             End If
         End If
     End Function
 
-    Public Function GetNextFixedLocation(ByVal curLoc As Point, ByVal cols As Integer, ByVal rows As Integer, ByVal width As Integer, ByVal height As Integer) As Point
-        Dim x As Integer = curLoc.X
-        Dim y As Integer = curLoc.Y
-
-        If x = -1 And y = -1 Then
-            Return New Point(0, 25)
-        Else
-            Return New Point((x + width) Mod (width * cols), IIf((x + width) = (width * cols), (y + height) Mod (height * rows), y))
-        End If
-    End Function
+    Public Sub aForceUpdate(ByRef control As Object)
+        control.Width += 1
+        control.Width -= 1
+    End Sub
 
     Public Function RemovePath(ByVal Path As String) As String
         Path = Regex.Replace(Path, ".*\\", "")
