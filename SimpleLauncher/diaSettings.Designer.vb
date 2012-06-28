@@ -41,7 +41,7 @@ Partial Class diaSettings
         '
         Me.btnOk.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.btnOk.Location = New System.Drawing.Point(117, 167)
-        Me.btnOk.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.btnOk.Margin = New System.Windows.Forms.Padding(4)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(89, 28)
         Me.btnOk.TabIndex = 0
@@ -60,7 +60,7 @@ Partial Class diaSettings
         'btnOpen
         '
         Me.btnOpen.Location = New System.Drawing.Point(149, 128)
-        Me.btnOpen.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.btnOpen.Margin = New System.Windows.Forms.Padding(4)
         Me.btnOpen.Name = "btnOpen"
         Me.btnOpen.Size = New System.Drawing.Size(96, 28)
         Me.btnOpen.TabIndex = 0
@@ -78,9 +78,9 @@ Partial Class diaSettings
         Me.gbAuto.Controls.Add(Me.numCols)
         Me.gbAuto.Controls.Add(Me.lblColumns)
         Me.gbAuto.Location = New System.Drawing.Point(16, 32)
-        Me.gbAuto.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.gbAuto.Margin = New System.Windows.Forms.Padding(4)
         Me.gbAuto.Name = "gbAuto"
-        Me.gbAuto.Padding = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.gbAuto.Padding = New System.Windows.Forms.Padding(4)
         Me.gbAuto.Size = New System.Drawing.Size(296, 89)
         Me.gbAuto.TabIndex = 7
         Me.gbAuto.TabStop = False
@@ -89,7 +89,7 @@ Partial Class diaSettings
         'numRows
         '
         Me.numRows.Location = New System.Drawing.Point(137, 52)
-        Me.numRows.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.numRows.Margin = New System.Windows.Forms.Padding(4)
         Me.numRows.Maximum = New Decimal(New Integer() {10, 0, 0, 0})
         Me.numRows.Minimum = New Decimal(New Integer() {2, 0, 0, 0})
         Me.numRows.Name = "numRows"
@@ -111,14 +111,14 @@ Partial Class diaSettings
         'numCols
         '
         Me.numCols.Location = New System.Drawing.Point(137, 23)
-        Me.numCols.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.numCols.Margin = New System.Windows.Forms.Padding(4)
         Me.numCols.Maximum = New Decimal(New Integer() {10, 0, 0, 0})
         Me.numCols.Minimum = New Decimal(New Integer() {2, 0, 0, 0})
         Me.numCols.Name = "numCols"
         Me.numCols.Size = New System.Drawing.Size(96, 22)
         Me.numCols.TabIndex = 0
         Me.numCols.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        Me.numCols.Value = New Decimal(New Integer() {10, 0, 0, 0})
+        Me.numCols.Value = New Decimal(New Integer() {5, 0, 0, 0})
         '
         'lblColumns
         '
@@ -136,7 +136,7 @@ Partial Class diaSettings
         Me.chkEnAuto.Checked = True
         Me.chkEnAuto.CheckState = System.Windows.Forms.CheckState.Checked
         Me.chkEnAuto.Location = New System.Drawing.Point(16, 4)
-        Me.chkEnAuto.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.chkEnAuto.Margin = New System.Windows.Forms.Padding(4)
         Me.chkEnAuto.Name = "chkEnAuto"
         Me.chkEnAuto.Size = New System.Drawing.Size(202, 21)
         Me.chkEnAuto.TabIndex = 9
@@ -155,7 +155,7 @@ Partial Class diaSettings
         Me.Controls.Add(Me.btnOpen)
         Me.Controls.Add(Me.lblProgram)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow
-        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "diaSettings"

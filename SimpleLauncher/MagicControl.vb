@@ -21,7 +21,7 @@
         My.Application.DoEvents()
         Dim activeControl As Control = sender
 
-        If frmMain.isLocked Then
+        If frmMainLocked Then
             activeControl.Cursor = Cursors.Default
             onEdge = EdgeEnum.None
             Exit Sub
@@ -93,7 +93,7 @@
 
     Private Sub myControl_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles myControl.MouseDown
         My.Application.DoEvents()
-        If frmMain.isLocked Then Exit Sub
+        If frmMainLocked Then Exit Sub
 
         If e.Button = MouseButtons.Left Then
             beginX = e.X
@@ -104,7 +104,7 @@
 
     Private Sub myControl_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles myControl.MouseUp
         My.Application.DoEvents()
-        If frmMain.isLocked Then Exit Sub
+        If frmMainLocked Then Exit Sub
 
         If e.Button = MouseButtons.Left Then
             isMouseDown = False
@@ -113,7 +113,7 @@
 
     Private Sub myControl_MouseLeave(ByVal sender As Object, ByVal e As System.EventArgs) Handles myControl.MouseLeave
         My.Application.DoEvents()
-        If frmMain.isLocked Then Exit Sub
+        If frmMainLocked Then Exit Sub
 
         Dim activeControl As Control = sender
         activeControl.Refresh()

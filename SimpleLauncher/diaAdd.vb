@@ -13,20 +13,14 @@ Public Class diaAdd
 
                 If My.Computer.FileSystem.FileExists(path) Then
                     Dim newButton As New Button
-
+                    newButton = createButton(frmMain.csButtons)
                     newButton.Tag = path
                     newButton.Text = label
-                    newButton.ContextMenuStrip = frmMain.csButtons
-                    newButton.AutoSize = True
-                    newButton.FlatStyle = FlatStyle.Popup
-                    newButton.BackColor = Color.FromArgb(120, 120, 190)
-                    newButton.ForeColor = Color.White
-
-                    AddHandler newButton.MouseDown, AddressOf frmMain.Button_MouseDown
                     frmMain.splitMain.Panel1.Controls.Add(newButton)
-                    newButton.Location = GetNextLocation(frmMain.lastPoint, frmMain.tableLoc, numCols.Value, numRows.Value, frmMain.lastSize)
-                    frmMain.lastSize = newButton.Size
-                    frmMain.lastPoint = newButton.Location
+                    Dim panelSize As Size = New Size(frmMain.splitMain.SplitterDistance, frmMain.splitMain.Height)
+                    newButton.Location = GetNewLocation(lastPoint, lastSize, newButton.Size, panelSize)
+                    lastSize = newButton.Size
+                    lastPoint = newButton.Location
                     frmMain.tmpControl = New MagicControl(newButton)
                 Else
                     MsgBox("Skipping the adding of" & vbCrLf & "'" & label & "'" & vbCrLf & "because it could not be found!", MsgBoxStyle.Exclamation)

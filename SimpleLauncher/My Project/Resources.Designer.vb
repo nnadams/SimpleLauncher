@@ -88,20 +88,6 @@ Namespace My.Resources
             End Get
         End Property
         
-        Friend ReadOnly Property lightbulb() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("lightbulb", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        Friend ReadOnly Property lightbulb_off() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("lightbulb_off", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
         Friend ReadOnly Property lock() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("lock", resourceCulture)
