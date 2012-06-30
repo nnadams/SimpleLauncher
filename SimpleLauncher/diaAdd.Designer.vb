@@ -55,7 +55,7 @@ Partial Class diaAdd
         Me.layoutPanel.ColumnCount = 3
         Me.layoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 87.04762!))
         Me.layoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.95238!))
-        Me.layoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 74.0!))
+        Me.layoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 75.0!))
         Me.layoutPanel.Controls.Add(Me.btnCancel, 2, 0)
         Me.layoutPanel.Controls.Add(Me.btnImport, 1, 0)
         Me.layoutPanel.Controls.Add(Me.pbarImport, 0, 0)
@@ -70,7 +70,7 @@ Partial Class diaAdd
         '
         Me.btnCancel.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(553, 3)
+        Me.btnCancel.Location = New System.Drawing.Point(552, 3)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(61, 23)
         Me.btnCancel.TabIndex = 1
@@ -79,7 +79,7 @@ Partial Class diaAdd
         'btnImport
         '
         Me.btnImport.Anchor = System.Windows.Forms.AnchorStyles.None
-        Me.btnImport.Location = New System.Drawing.Point(479, 3)
+        Me.btnImport.Location = New System.Drawing.Point(478, 3)
         Me.btnImport.Name = "btnImport"
         Me.btnImport.Size = New System.Drawing.Size(64, 23)
         Me.btnImport.TabIndex = 0
@@ -89,7 +89,7 @@ Partial Class diaAdd
         '
         Me.pbarImport.Location = New System.Drawing.Point(3, 3)
         Me.pbarImport.Name = "pbarImport"
-        Me.pbarImport.Size = New System.Drawing.Size(470, 23)
+        Me.pbarImport.Size = New System.Drawing.Size(469, 23)
         Me.pbarImport.Style = System.Windows.Forms.ProgressBarStyle.Continuous
         Me.pbarImport.TabIndex = 2
         '

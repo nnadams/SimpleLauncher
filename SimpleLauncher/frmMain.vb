@@ -2,11 +2,48 @@
 Imports System.Text
 
 Public Class frmMain
+#Region "Declarations"
     Public tmpControl As MagicControl
 
     Private isFullScreen As Boolean = False
     Private datFile As String = My.Application.Info.DirectoryPath.ToString() & "\Enid.dat"
+#End Region
+#Region "Button"
+    Public Sub Button_MouseDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs)
+        Dim activeButton As Button
+        activeButton = sender
 
+        If frmMainLocked And e.Button = Windows.Forms.MouseButtons.Left Then
+            If activeButton.Tag = "" Then
+                MsgBox("There was an error accessing data. Please remove and reimport this file.", MsgBoxStyle.Critical)
+            ElseIf dialogSettings.openDialog.FileName = "" Then
+                MsgBox("Please choose an application to launch with.", MsgBoxStyle.Exclamation)
+            Else
+                Process.Start(dialogSettings.openDialog.FileName, Chr(34) & activeButton.Tag & Chr(34))
+            End If
+        Else
+            For Each item As ListViewItem In lvItems.Items
+                If activeButton.Text = item.Text Then lvItems.Items(item.Index).Selected = True
+            Next
+        End If
+    End Sub
+
+    Public Sub Button_Reize(ByVal sender As Object, ByVal e As System.EventArgs)
+        Dim activeButton As Button
+        activeButton = sender
+
+        txtWidth.Text = activeButton.Width
+        txtHeight.Text = activeButton.Height
+    End Sub
+
+    Public Sub Button_Move(ByVal sender As Object, ByVal e As System.EventArgs)
+        Dim activeButton As Button
+        activeButton = sender
+
+        txtX.Text = activeButton.Location.X
+        txtY.Text = activeButton.Location.Y
+    End Sub
+#End Region
 #Region "Toolbar"
     Private Sub tbtnSettings_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbtnSettings.Click
         dialogSettings.ShowDialog()
@@ -63,6 +100,7 @@ Public Class frmMain
 
         activeButton.Visible = False
         RefreshList()
+        ClearProperties()
     End Sub
 
     Private Sub csitemRename_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles csitemRename.Click
@@ -78,11 +116,12 @@ Public Class frmMain
         If buffer <> "" Then
             If Not searchForExisting(buffer) Then
                 activeButton.Text = buffer
+                lvItems.SelectedItems(0).Text = buffer
             Else
                 MsgBox("There is already a button with that name.", MsgBoxStyle.Exclamation)
             End If
         End If
-        RefreshList()
+        SetProperties(activeButton)
     End Sub
 
     Private Sub csitemRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles csitemRemove.Click
@@ -98,9 +137,58 @@ Public Class frmMain
             splitMain.Panel1.Controls.Remove(activeButton)
         End If
         RefreshList()
+        ClearProperties()
     End Sub
 #End Region
+#Region "lvItems"
 
+    Private Sub lvItems_AfterLabelEdit(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LabelEditEventArgs) Handles lvItems.AfterLabelEdit
+        If e.Label = "" Or searchForExisting(e.Label) Then
+            e.CancelEdit = True
+        Else
+            For Each control As Button In splitMain.Panel1.Controls
+                If control.Text = lvItems.Items(e.Item).Text Then control.Text = e.Label
+            Next
+        End If
+        lvItems.LabelEdit = False
+    End Sub
+
+    Private Sub lvItems_ItemSelectionChanged(ByVal sender As Object, ByVal e As System.Windows.Forms.ListViewItemSelectionChangedEventArgs) Handles lvItems.ItemSelectionChanged
+        If lvItems.SelectedItems.Count = 0 Then
+            splitSide.Panel2.Enabled = False
+            ClearProperties()
+        Else
+            splitSide.Panel2.Enabled = True
+            For Each control As Button In splitMain.Panel1.Controls
+                If control.Text = e.Item.Text Then
+                    control.Focus()
+                    SetProperties(control)
+                    Exit Sub
+                End If
+            Next
+        End If
+    End Sub
+
+    Private Sub lvMain_KeyDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles lvItems.KeyDown
+        If e.KeyCode = Keys.F2 And lvItems.SelectedItems.Count = 1 Then
+            lvItems.LabelEdit = True
+            lvItems.SelectedItems.Item(0).BeginEdit()
+        End If
+    End Sub
+
+    Private Sub RefreshList()
+        lvItems.Items.Clear()
+        For Each control As Button In splitMain.Panel1.Controls
+            Dim item As New ListViewItem
+            item.Text = control.Text
+            item.BackColor = control.BackColor
+            item.ForeColor = control.ForeColor
+
+            lvItems.Items.Add(item)
+        Next
+    End Sub
+#End Region
+#Region "Form"
     Private Sub toNormal()
         Me.FormBorderStyle = Windows.Forms.FormBorderStyle.Sizable
         Me.WindowState = FormWindowState.Normal
@@ -115,20 +203,13 @@ Public Class frmMain
         isFullScreen = True
     End Sub
 
-    Private Sub RefreshList()
-        clbButtons.Items.Clear()
-        For Each control As Button In splitMain.Panel1.Controls
-            Dim checked As Boolean = IIf(control.Visible, True, False)
-            clbButtons.Items.Add(control.Text, checked)
-        Next
-    End Sub
-
     Private Function searchForExisting(ByVal text As String) As Boolean
         For Each control As Button In splitMain.Panel1.Controls
             If control.Text = text Then
                 Return True
             End If
         Next
+
         Return False
     End Function
 
@@ -245,6 +326,7 @@ Public Class frmMain
             curline += 1
         Loop
         streamReader.Close()
+        ClearProperties()
         RefreshList()
     End Sub
 
@@ -253,6 +335,14 @@ Public Class frmMain
             e.Cancel = True
         Else
             e.Cancel = False
+        End If
+    End Sub
+
+    Private Sub frmMain_KeyDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+        If e.KeyCode = Keys.F11 Then
+            If isFullScreen Then toNormal() Else toFullScreen()
+        ElseIf e.KeyCode = Keys.F4 Then
+            If splitMain.Panel2Collapsed Then splitMain.Panel2Collapsed = False Else splitMain.Panel2Collapsed = True
         End If
     End Sub
 
@@ -283,24 +373,144 @@ Public Class frmMain
             dialogList.lvChoosen.Items(0).Selected = True
         End If
     End Sub
+#End Region
+#Region "Properties Bar"
+    Private Sub ClearProperties()
+        txtText.Text = ""
+        txtPath.Text = ""
+        txtColor.Text = ""
+        txttColor.Text = ""
+        txtWidth.Text = ""
+        txtHeight.Text = ""
+        txtX.Text = ""
+        txtY.Text = ""
+        chkVisible.Checked = False
+    End Sub
 
-    Private Sub frmMain_KeyDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
-        If e.KeyCode = Keys.F11 Then
-            If isFullScreen Then toNormal() Else toFullScreen()
-        ElseIf e.KeyCode = Keys.F4 Then
-            If splitMain.Panel2Collapsed Then splitMain.Panel2Collapsed = False Else splitMain.Panel2Collapsed = True
+    Private Sub SetProperties(ByVal control As Button)
+        txtText.Text = control.Text
+        txtPath.Text = control.Tag
+        txtColor.Text = ColorToHex(control.BackColor)
+        txttColor.Text = ColorToHex(control.ForeColor)
+        txtWidth.Text = control.Width
+        txtHeight.Text = control.Height
+        txtX.Text = control.Location.X
+        txtY.Text = control.Location.Y
+        chkVisible.Checked = control.Visible
+    End Sub
+
+    Private Sub PaintEllipsis(ByVal sender As System.Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles btnPath.Paint
+        If splitSide.Panel2.Enabled Then
+            e.Graphics.DrawString("...", New Font("Microsoft Sans Serif", 8.25, FontStyle.Regular, GraphicsUnit.Point, 0), Brushes.White, 4, 1)
+        Else
+            e.Graphics.DrawString("...", New Font("Microsoft Sans Serif", 8.25, FontStyle.Regular, GraphicsUnit.Point, 0), Brushes.DarkGray, 4, 1)
         End If
     End Sub
 
-    Private Sub splitMain_SplitterMoved(ByVal sender As System.Object, ByVal e As System.Windows.Forms.SplitterEventArgs) Handles splitMain.SplitterMoved
-        Me.ActiveControl = Nothing
+    Private Sub btnPath_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPath.Click
+        openDialog.InitialDirectory = RemoveFile(txtPath.Text)
+        openDialog.FileName = RemovePath(txtPath.Text)
+        If openDialog.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            txtPath.Text = openDialog.FileName
+        End If
     End Sub
 
-    Private Sub clbButtons_ItemCheck(ByVal sender As System.Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs) Handles clbButtons.ItemCheck
+    Private Sub txttColor_DoubleClick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txttColor.DoubleClick
+        colorDialog.Color = HexToColor(txttColor.Text)
+        If colorDialog.ShowDialog = Windows.Forms.DialogResult.OK Then
+            txttColor.Text = ColorToHex(colorDialog.Color)
+            ColorsValidated(sender, e)
+        End If
+    End Sub
+
+    Private Sub txtColor_DoubleClick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtColor.DoubleClick
+        colorDialog.Color = HexToColor(txtColor.Text)
+        If colorDialog.ShowDialog = Windows.Forms.DialogResult.OK Then
+            txtColor.Text = ColorToHex(colorDialog.Color)
+            ColorsValidated(sender, e)
+        End If
+    End Sub
+
+    Private Sub ColorValidating(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles txttColor.Validating, txtColor.Validating
+        Dim control As TextBox = sender
+        If control.Text.Length <> 6 Then e.Cancel = True : Exit Sub
+        If HexToColor(control.Text) = Color.Transparent Then e.Cancel = True
+    End Sub
+
+    Private Sub FileValidating(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles txtPath.Validating
+        Dim control As TextBox = sender
+        If My.Computer.FileSystem.FileExists(control.Text) = False Then
+            MsgBox("That file does not exist!", MsgBoxStyle.Critical)
+            e.Cancel = True
+        End If
+    End Sub
+
+    Private Sub EmptyValidating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles txtText.Validating
+        Dim control As TextBox = sender
+        If control.Text = "" Then e.Cancel = True
+    End Sub
+
+    Private Sub NumberValidating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles txtWidth.Validating, txtHeight.Validating, txtX.Validating, txtY.Validating
+        Dim control As TextBox = sender
+        If control.Text = "" Or IsNumeric(control.Text) = False Then e.Cancel = True
+    End Sub
+
+    Private Sub txtText_Validated(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtText.Validated
+        If lvItems.SelectedItems.Count = 0 Then Exit Sub
         For Each control As Button In splitMain.Panel1.Controls
-            If control.Text = clbButtons.Items(e.Index) Then
-                control.Visible = IIf(e.NewValue = CheckState.Checked, True, False)
+            If control.Text = lvItems.SelectedItems(0).Text Then
+                control.Text = txtText.Text
             End If
         Next
     End Sub
+
+    Private Sub txtPath_Validated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtPath.Validated
+        If lvItems.SelectedItems.Count = 0 Then Exit Sub
+        For Each control As Button In splitMain.Panel1.Controls
+            If control.Text = lvItems.SelectedItems(0).Text Then
+                control.Tag = txtPath.Text
+            End If
+        Next
+    End Sub
+
+    Private Sub SizeValidated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtWidth.Validated, txtHeight.Validated
+        If lvItems.SelectedItems.Count = 0 Then Exit Sub
+        For Each control As Button In splitMain.Panel1.Controls
+            If control.Text = lvItems.SelectedItems(0).Text Then
+                control.Size = New Size(CInt(txtWidth.Text), CInt(txtHeight.Text))
+            End If
+        Next
+    End Sub
+
+    Private Sub XYValidated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtX.Validated, txtY.Validated
+        If lvItems.SelectedItems.Count = 0 Then Exit Sub
+        For Each control As Button In splitMain.Panel1.Controls
+            If control.Text = lvItems.SelectedItems(0).Text Then
+                control.Location = New Point(CInt(txtX.Text), CInt(txtY.Text))
+            End If
+        Next
+    End Sub
+
+    Private Sub ColorsValidated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txttColor.Validated, txtColor.Validated
+        If lvItems.SelectedItems.Count = 0 Then Exit Sub
+        For Each control As Button In splitMain.Panel1.Controls
+            If control.Text = lvItems.SelectedItems(0).Text Then
+                control.ForeColor = HexToColor(txttColor.Text)
+                control.BackColor = HexToColor(txtColor.Text)
+                lvItems.SelectedItems(0).ForeColor = control.ForeColor
+                lvItems.SelectedItems(0).BackColor = control.BackColor
+            End If
+        Next
+    End Sub
+
+    Private Sub chkVisible_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkVisible.CheckedChanged
+        If lvItems.SelectedItems.Count = 0 Then Exit Sub
+        For Each control As Button In splitMain.Panel1.Controls
+            If control.Text = lvItems.SelectedItems(0).Text Then
+                control.Visible = chkVisible.Checked
+                Exit Sub
+            End If
+        Next
+    End Sub
+#End Region
 End Class
