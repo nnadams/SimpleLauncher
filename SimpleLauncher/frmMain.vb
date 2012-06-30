@@ -22,8 +22,11 @@ Public Class frmMain
                 Process.Start(dialogSettings.openDialog.FileName, Chr(34) & activeButton.Tag & Chr(34))
             End If
         Else
-            For Each item As ListViewItem In lvItems.Items
-                If activeButton.Text = item.Text Then lvItems.Items(item.Index).Selected = True
+            For Each item As TreeNode In tvItems.Nodes
+                If activeButton.Text = item.Text Then
+                    tvItems.SelectedNode = item
+                    SetProperties(activeButton)
+                End If
             Next
         End If
     End Sub
@@ -100,7 +103,6 @@ Public Class frmMain
 
         activeButton.Visible = False
         RefreshList()
-        ClearProperties()
     End Sub
 
     Private Sub csitemRename_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles csitemRename.Click
@@ -116,7 +118,7 @@ Public Class frmMain
         If buffer <> "" Then
             If Not searchForExisting(buffer) Then
                 activeButton.Text = buffer
-                lvItems.SelectedItems(0).Text = buffer
+                tvItems.SelectedNode.Text = buffer
             Else
                 MsgBox("There is already a button with that name.", MsgBoxStyle.Exclamation)
             End If
@@ -140,52 +142,71 @@ Public Class frmMain
         ClearProperties()
     End Sub
 #End Region
-#Region "lvItems"
+#Region "tvItems"
+    Private Function isNodeButton(ByVal node As TreeNode) As Boolean
+        For Each control As Button In splitMain.Panel1.Controls
+            If control.Text = node.Text Then Return True
+        Next
+        Return False
+    End Function
 
-    Private Sub lvItems_AfterLabelEdit(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LabelEditEventArgs) Handles lvItems.AfterLabelEdit
+    Private Sub RefreshList()
+        tvItems.BeginUpdate()
+        Dim selected As String = ""
+        If Not tvItems.SelectedNode Is Nothing Then selected = tvItems.SelectedNode.Text
+
+        tvItems.Nodes.Clear()
+        For Each control As Button In splitMain.Panel1.Controls
+            Dim item As New TreeNode
+            item.Text = control.Text
+            item.BackColor = control.BackColor
+            item.ForeColor = control.ForeColor
+            If control.Visible Then
+                item.ImageKey = "default"
+                item.SelectedImageKey = "default"
+            Else
+                item.ImageKey = "blank"
+                item.SelectedImageKey = "blank"
+            End If
+
+            tvItems.Nodes.Add(item)
+            If selected = item.Text Then tvItems.SelectedNode = item
+        Next
+        tvItems.EndUpdate()
+    End Sub
+
+    Private Sub tvItems_AfterLabelEdit(ByVal sender As System.Object, ByVal e As System.Windows.Forms.NodeLabelEditEventArgs) Handles tvItems.AfterLabelEdit
         If e.Label = "" Or searchForExisting(e.Label) Then
             e.CancelEdit = True
         Else
             For Each control As Button In splitMain.Panel1.Controls
-                If control.Text = lvItems.Items(e.Item).Text Then control.Text = e.Label
-            Next
-        End If
-        lvItems.LabelEdit = False
-    End Sub
-
-    Private Sub lvItems_ItemSelectionChanged(ByVal sender As Object, ByVal e As System.Windows.Forms.ListViewItemSelectionChangedEventArgs) Handles lvItems.ItemSelectionChanged
-        If lvItems.SelectedItems.Count = 0 Then
-            splitSide.Panel2.Enabled = False
-            ClearProperties()
-        Else
-            splitSide.Panel2.Enabled = True
-            For Each control As Button In splitMain.Panel1.Controls
-                If control.Text = e.Item.Text Then
-                    control.Focus()
-                    SetProperties(control)
+                If control.Text = e.Node.Text Then
+                    control.Text = e.Label
+                    tvItems.LabelEdit = False
                     Exit Sub
                 End If
             Next
         End If
     End Sub
 
-    Private Sub lvMain_KeyDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles lvItems.KeyDown
-        If e.KeyCode = Keys.F2 And lvItems.SelectedItems.Count = 1 Then
-            lvItems.LabelEdit = True
-            lvItems.SelectedItems.Item(0).BeginEdit()
-        End If
+    Private Sub tvItems_AfterSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles tvItems.AfterSelect
+        For Each control As Button In splitMain.Panel1.Controls
+            If control.Text = e.Node.Text Then
+                SetProperties(control)
+                Exit Sub
+            End If
+        Next
     End Sub
 
-    Private Sub RefreshList()
-        lvItems.Items.Clear()
-        For Each control As Button In splitMain.Panel1.Controls
-            Dim item As New ListViewItem
-            item.Text = control.Text
-            item.BackColor = control.BackColor
-            item.ForeColor = control.ForeColor
+    Private Sub tvItems_BeforeSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewCancelEventArgs) Handles tvItems.BeforeSelect
+        If isNodeButton(e.Node) = False Then e.Cancel = True
+    End Sub
 
-            lvItems.Items.Add(item)
-        Next
+    Private Sub tvItems_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles tvItems.KeyDown
+        If e.KeyCode = Keys.F2 Then
+            tvItems.LabelEdit = True
+            tvItems.SelectedNode.BeginEdit()
+        End If
     End Sub
 #End Region
 #Region "Form"
@@ -269,7 +290,9 @@ Public Class frmMain
     End Sub
 
     Private Sub frmMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        PrepareImageList()
         splitMain.Panel1.BackColor = Color.FromArgb(255, 60, 70, 75)
+
         If Not My.Computer.FileSystem.FileExists(datFile) Then Exit Sub
 
         Dim streamReader As New StreamReader(datFile)
@@ -373,6 +396,19 @@ Public Class frmMain
             dialogList.lvChoosen.Items(0).Selected = True
         End If
     End Sub
+
+    Private Sub PrepareImageList()
+        imglstTree.Images.Add("default", My.Resources.application)
+        imglstTree.Images.Add("terminal", My.Resources.application_xp_terminal)
+        imglstTree.Images.Add("film", My.Resources.film)
+        imglstTree.Images.Add("folder", My.Resources.folder_table)
+        imglstTree.Images.Add("music", My.Resources.music)
+        imglstTree.Images.Add("photo", My.Resources.photo)
+        imglstTree.Images.Add("blank", My.Resources.background)
+
+        tvItems.ImageKey = "default"
+        tvItems.SelectedImageKey = "default"
+    End Sub
 #End Region
 #Region "Properties Bar"
     Private Sub ClearProperties()
@@ -456,61 +492,67 @@ Public Class frmMain
     End Sub
 
     Private Sub txtText_Validated(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtText.Validated
-        If lvItems.SelectedItems.Count = 0 Then Exit Sub
         For Each control As Button In splitMain.Panel1.Controls
-            If control.Text = lvItems.SelectedItems(0).Text Then
+            If control.Text = tvItems.SelectedNode.Text Then
                 control.Text = txtText.Text
+                Exit Sub
             End If
         Next
     End Sub
 
     Private Sub txtPath_Validated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtPath.Validated
-        If lvItems.SelectedItems.Count = 0 Then Exit Sub
         For Each control As Button In splitMain.Panel1.Controls
-            If control.Text = lvItems.SelectedItems(0).Text Then
+            If control.Text = tvItems.SelectedNode.Text Then
                 control.Tag = txtPath.Text
+                Exit Sub
             End If
         Next
     End Sub
 
     Private Sub SizeValidated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtWidth.Validated, txtHeight.Validated
-        If lvItems.SelectedItems.Count = 0 Then Exit Sub
         For Each control As Button In splitMain.Panel1.Controls
-            If control.Text = lvItems.SelectedItems(0).Text Then
+            If control.Text = tvItems.SelectedNode.Text Then
                 control.Size = New Size(CInt(txtWidth.Text), CInt(txtHeight.Text))
+                Exit Sub
             End If
         Next
     End Sub
 
     Private Sub XYValidated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtX.Validated, txtY.Validated
-        If lvItems.SelectedItems.Count = 0 Then Exit Sub
         For Each control As Button In splitMain.Panel1.Controls
-            If control.Text = lvItems.SelectedItems(0).Text Then
+            If control.Text = tvItems.SelectedNode.Text Then
                 control.Location = New Point(CInt(txtX.Text), CInt(txtY.Text))
+                Exit Sub
             End If
         Next
     End Sub
 
     Private Sub ColorsValidated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txttColor.Validated, txtColor.Validated
-        If lvItems.SelectedItems.Count = 0 Then Exit Sub
         For Each control As Button In splitMain.Panel1.Controls
-            If control.Text = lvItems.SelectedItems(0).Text Then
+            If control.Text = tvItems.SelectedNode.Text Then
                 control.ForeColor = HexToColor(txttColor.Text)
                 control.BackColor = HexToColor(txtColor.Text)
-                lvItems.SelectedItems(0).ForeColor = control.ForeColor
-                lvItems.SelectedItems(0).BackColor = control.BackColor
+                tvItems.SelectedNode.ForeColor = control.ForeColor
+                tvItems.SelectedNode.BackColor = control.BackColor
+                Exit Sub
             End If
         Next
     End Sub
 
     Private Sub chkVisible_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkVisible.CheckedChanged
-        If lvItems.SelectedItems.Count = 0 Then Exit Sub
+        If tvItems.SelectedNode Is Nothing Then Exit Sub
         For Each control As Button In splitMain.Panel1.Controls
-            If control.Text = lvItems.SelectedItems(0).Text Then
+            If control.Text = tvItems.SelectedNode.Text Then
                 control.Visible = chkVisible.Checked
+                RefreshList()
                 Exit Sub
             End If
         Next
+    End Sub
+
+    Private Sub txttColor_MouseHover(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txttColor.MouseHover, txtColor.MouseHover
+        Dim control As Control = sender
+        ttColorMsg.Show("Double-click to view a color picker", control)
     End Sub
 #End Region
 End Class

@@ -67,6 +67,20 @@ Namespace My.Resources
             End Get
         End Property
         
+        Friend ReadOnly Property application() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("application", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        Friend ReadOnly Property application_xp_terminal() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("application_xp_terminal", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
         Friend ReadOnly Property background() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("background", resourceCulture)
@@ -88,6 +102,20 @@ Namespace My.Resources
             End Get
         End Property
         
+        Friend ReadOnly Property film() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("film", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        Friend ReadOnly Property folder_table() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("folder_table", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
         Friend ReadOnly Property lock() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("lock", resourceCulture)
@@ -102,6 +130,13 @@ Namespace My.Resources
             End Get
         End Property
         
+        Friend ReadOnly Property music() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("music", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
         Friend ReadOnly Property page_add() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("page_add", resourceCulture)
@@ -113,6 +148,13 @@ Namespace My.Resources
             Get
                 Dim obj As Object = ResourceManager.GetObject("page_delete", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        Friend ReadOnly Property photo() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("photo", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
             End Get
         End Property
     End Module

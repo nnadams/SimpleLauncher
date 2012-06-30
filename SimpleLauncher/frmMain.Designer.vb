@@ -31,8 +31,8 @@ Partial Class frmMain
         Me.tsContainer = New System.Windows.Forms.ToolStripContainer
         Me.splitMain = New System.Windows.Forms.SplitContainer
         Me.splitSide = New System.Windows.Forms.SplitContainer
-        Me.lvItems = New System.Windows.Forms.ListView
-        Me.colHeader = New System.Windows.Forms.ColumnHeader
+        Me.tvItems = New System.Windows.Forms.TreeView
+        Me.imglstTree = New System.Windows.Forms.ImageList(Me.components)
         Me.chkVisible = New System.Windows.Forms.CheckBox
         Me.btnPath = New System.Windows.Forms.Button
         Me.txtHeight = New System.Windows.Forms.TextBox
@@ -61,6 +61,7 @@ Partial Class frmMain
         Me.tbtnSettings = New System.Windows.Forms.ToolStripButton
         Me.openDialog = New System.Windows.Forms.OpenFileDialog
         Me.colorDialog = New System.Windows.Forms.ColorDialog
+        Me.ttColorMsg = New System.Windows.Forms.ToolTip(Me.components)
         Me.csButtons.SuspendLayout()
         Me.tsContainer.ContentPanel.SuspendLayout()
         Me.tsContainer.LeftToolStripPanel.SuspendLayout()
@@ -148,7 +149,7 @@ Partial Class frmMain
         Me.splitMain.Panel2.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.splitMain.Panel2.Controls.Add(Me.splitSide)
         Me.splitMain.Size = New System.Drawing.Size(1323, 726)
-        Me.splitMain.SplitterDistance = 1121
+        Me.splitMain.SplitterDistance = 1125
         Me.splitMain.SplitterWidth = 3
         Me.splitMain.TabIndex = 0
         Me.splitMain.TabStop = False
@@ -165,7 +166,7 @@ Partial Class frmMain
         '
         'splitSide.Panel1
         '
-        Me.splitSide.Panel1.Controls.Add(Me.lvItems)
+        Me.splitSide.Panel1.Controls.Add(Me.tvItems)
         '
         'splitSide.Panel2
         '
@@ -188,37 +189,35 @@ Partial Class frmMain
         Me.splitSide.Panel2.Controls.Add(Me.lbltColor)
         Me.splitSide.Panel2.Controls.Add(Me.lblPath)
         Me.splitSide.Panel2.Controls.Add(Me.lblText)
-        Me.splitSide.Panel2.Enabled = False
-        Me.splitSide.Size = New System.Drawing.Size(199, 726)
-        Me.splitSide.SplitterDistance = 372
+        Me.splitSide.Panel2MinSize = 147
+        Me.splitSide.Size = New System.Drawing.Size(195, 726)
+        Me.splitSide.SplitterDistance = 461
         Me.splitSide.SplitterIncrement = 17
         Me.splitSide.SplitterWidth = 3
         Me.splitSide.TabIndex = 0
         '
-        'lvItems
+        'tvItems
         '
-        Me.lvItems.BackColor = System.Drawing.SystemColors.InactiveCaptionText
-        Me.lvItems.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.lvItems.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.colHeader})
-        Me.lvItems.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.lvItems.ForeColor = System.Drawing.Color.White
-        Me.lvItems.FullRowSelect = True
-        Me.lvItems.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None
-        Me.lvItems.HideSelection = False
-        Me.lvItems.Location = New System.Drawing.Point(0, 0)
-        Me.lvItems.MultiSelect = False
-        Me.lvItems.Name = "lvItems"
-        Me.lvItems.ShowGroups = False
-        Me.lvItems.Size = New System.Drawing.Size(197, 370)
-        Me.lvItems.Sorting = System.Windows.Forms.SortOrder.Ascending
-        Me.lvItems.TabIndex = 0
-        Me.lvItems.UseCompatibleStateImageBehavior = False
-        Me.lvItems.View = System.Windows.Forms.View.Details
+        Me.tvItems.BackColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.tvItems.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.tvItems.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.tvItems.ForeColor = System.Drawing.Color.White
+        Me.tvItems.HideSelection = False
+        Me.tvItems.ImageIndex = 0
+        Me.tvItems.ImageList = Me.imglstTree
+        Me.tvItems.LineColor = System.Drawing.Color.FromArgb(CType(CType(160, Byte), Integer), CType(CType(160, Byte), Integer), CType(CType(160, Byte), Integer))
+        Me.tvItems.Location = New System.Drawing.Point(0, 0)
+        Me.tvItems.Name = "tvItems"
+        Me.tvItems.SelectedImageIndex = 0
+        Me.tvItems.ShowRootLines = False
+        Me.tvItems.Size = New System.Drawing.Size(193, 459)
+        Me.tvItems.TabIndex = 0
         '
-        'colHeader
+        'imglstTree
         '
-        Me.colHeader.Text = ""
-        Me.colHeader.Width = 192
+        Me.imglstTree.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit
+        Me.imglstTree.ImageSize = New System.Drawing.Size(16, 16)
+        Me.imglstTree.TransparentColor = System.Drawing.Color.Transparent
         '
         'chkVisible
         '
@@ -547,8 +546,6 @@ Partial Class frmMain
     Friend WithEvents splitMain As System.Windows.Forms.SplitContainer
     Friend WithEvents splitSide As System.Windows.Forms.SplitContainer
     Friend WithEvents csItemHide As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents lvItems As System.Windows.Forms.ListView
-    Friend WithEvents colHeader As System.Windows.Forms.ColumnHeader
     Friend WithEvents txtText As System.Windows.Forms.TextBox
     Friend WithEvents lblText As System.Windows.Forms.Label
     Friend WithEvents txtPath As System.Windows.Forms.TextBox
@@ -570,5 +567,8 @@ Partial Class frmMain
     Friend WithEvents colorDialog As System.Windows.Forms.ColorDialog
     Friend WithEvents chkVisible As System.Windows.Forms.CheckBox
     Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents tvItems As System.Windows.Forms.TreeView
+    Friend WithEvents imglstTree As System.Windows.Forms.ImageList
+    Friend WithEvents ttColorMsg As System.Windows.Forms.ToolTip
 
 End Class

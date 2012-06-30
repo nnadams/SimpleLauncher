@@ -223,6 +223,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="blue_pill.ico" />
+    <None Include="Resources\photo.ico" />
+    <None Include="Resources\music.ico" />
+    <None Include="Resources\folder_table.ico" />
+    <None Include="Resources\film.ico" />
+    <None Include="Resources\application_xp_terminal.ico" />
+    <None Include="Resources\application.ico" />
     <None Include="Resources\background.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
