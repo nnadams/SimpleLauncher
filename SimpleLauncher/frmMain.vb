@@ -14,12 +14,18 @@ Public Class frmMain
         activeButton = sender
 
         If frmMainLocked And e.Button = Windows.Forms.MouseButtons.Left Then
+            Dim file As String = Split(activeButton.Tag, "|")(0)
+            Dim program As String = Split(activeButton.Tag, "|")(1)
             If activeButton.Tag = "" Then
                 MsgBox("There was an error accessing data. Please remove and reimport this file.", MsgBoxStyle.Critical)
-            ElseIf dialogSettings.openDialog.FileName = "" Then
+            ElseIf file = "" Then
+                MsgBox("No file is associated with this button.", MsgBoxStyle.Exclamation)
+            ElseIf Split(activeButton.Tag, "|")(1) = "" AndAlso GetFileType(RemovePath(file)) <> "terminal" Then
                 MsgBox("Please choose an application to launch with.", MsgBoxStyle.Exclamation)
+            ElseIf Split(activeButton.Tag, "|")(1) = "" AndAlso GetFileType(RemovePath(file)) = "terminal" Then
+                Process.Start(file)
             Else
-                Process.Start(dialogSettings.openDialog.FileName, Chr(34) & activeButton.Tag & Chr(34))
+                Process.Start(program, Chr(34) & file & Chr(34))
             End If
         Else
             For Each item As TreeNode In tvItems.Nodes.Item(0).Nodes
@@ -74,7 +80,7 @@ Public Class frmMain
     End Sub
 #End Region
 #Region "ContextMenus"
-    Private Sub csItemHide_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles csItemHide.Click
+    Private Sub csButtonsHide_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles csButtonsHide.Click
         Dim control As New ToolStripMenuItem
         Dim strip As New ContextMenuStrip
         Dim activeButton As New Button
@@ -87,7 +93,7 @@ Public Class frmMain
         RefreshList()
     End Sub
 
-    Private Sub csitemRename_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles csitemRename.Click
+    Private Sub csButtonsRename_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles csButtonsRename.Click
         Dim control As New ToolStripMenuItem
         Dim strip As New ContextMenuStrip
         Dim activeButton As New Button
@@ -108,7 +114,7 @@ Public Class frmMain
         SetProperties(activeButton)
     End Sub
 
-    Private Sub csitemRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles csitemRemove.Click
+    Private Sub csButtonsRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles csButtonsRemove.Click
         Dim control As New ToolStripMenuItem
         Dim strip As New ContextMenuStrip
         Dim activeButton As New Button
@@ -117,11 +123,15 @@ Public Class frmMain
         strip = control.Owner
         activeButton = strip.SourceControl
 
-        If MsgBox("Really delete '" & activeButton.Text & "'?", MsgBoxStyle.YesNo, "Delete?") = MsgBoxResult.Yes Then
+        If MsgBox("Really delete '" & activeButton.Text & "'?", MsgBoxStyle.YesNo + MsgBoxStyle.Information, "Delete?") = MsgBoxResult.Yes Then
             splitMain.Panel1.Controls.Remove(activeButton)
         End If
         RefreshList()
         ClearProperties()
+    End Sub
+
+    Private Sub csTreeNodesRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles csTreeNodesRemove.Click
+        RemoveSelected()
     End Sub
 #End Region
 #Region "tvItems"
@@ -144,8 +154,9 @@ Public Class frmMain
             item.BackColor = control.BackColor
             item.ForeColor = control.ForeColor
             If control.Visible Then
-                item.ImageKey = "default"
-                item.SelectedImageKey = "default"
+                Dim type As String = GetFileType(RemovePath(Split(control.Tag, "|")(0)))
+                item.ImageKey = type
+                item.SelectedImageKey = type
             Else
                 item.ImageKey = "blank"
                 item.SelectedImageKey = "blank"
@@ -158,10 +169,29 @@ Public Class frmMain
         tvItems.EndUpdate()
     End Sub
 
+    Private Sub RemoveSelected()
+        If tvItems.SelectedNode Is Nothing Then Exit Sub
+        If isNodeButton(tvItems.SelectedNode) Then
+            For Each control As Button In splitMain.Panel1.Controls
+                If control.Text = tvItems.SelectedNode.Text Then
+                    If MsgBox("Really delete '" & control.Text & "'?", MsgBoxStyle.YesNo + MsgBoxStyle.Information, "Delete?") = MsgBoxResult.Yes Then
+                        splitMain.Panel1.Controls.Remove(control)
+                        RefreshList()
+                        ClearProperties()
+                    End If
+                End If
+            Next
+        End If
+    End Sub
+
     Private Sub tvItems_AfterLabelEdit(ByVal sender As System.Object, ByVal e As System.Windows.Forms.NodeLabelEditEventArgs) Handles tvItems.AfterLabelEdit
-        If e.Label = "" Or searchForExisting(e.Label) Then
+        If e.Label = "" Or (isNodeButton(e.Node) AndAlso searchForExisting(e.Label)) Then
             e.CancelEdit = True
         Else
+            If e.Node Is tvItems.Nodes.Item(0) Then
+                Me.Text = e.Label & " - Enid"
+                Exit Sub
+            End If
             For Each control As Button In splitMain.Panel1.Controls
                 If control.Text = e.Node.Text Then
                     control.Text = e.Label
@@ -176,11 +206,13 @@ Public Class frmMain
         If isNodeButton(e.Node) Then
             For Each control As Button In splitMain.Panel1.Controls
                 If control.Text = e.Node.Text Then
+                    splitSide.Panel2.Enabled = True
                     SetProperties(control)
                     Exit Sub
                 End If
             Next
         Else
+            splitSide.Panel2.Enabled = False
             ClearProperties()
         End If
     End Sub
@@ -189,6 +221,17 @@ Public Class frmMain
         If e.KeyCode = Keys.F2 Then
             tvItems.LabelEdit = True
             tvItems.SelectedNode.BeginEdit()
+        ElseIf e.KeyCode = Keys.Delete Then
+            RemoveSelected()
+        End If
+    End Sub
+
+    Private Sub tvItems_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles tvItems.MouseClick
+        If e.Button = Windows.Forms.MouseButtons.Right Then
+            tvItems.SelectedNode = tvItems.GetNodeAt(e.Location)
+            If isNodeButton(tvItems.SelectedNode) Then
+                csTreeNodes.Show(tvItems, e.Location)
+            End If
         End If
     End Sub
 #End Region
@@ -261,6 +304,7 @@ Public Class frmMain
                 End If
             Next
             RefreshList()
+            tvItems.SelectedNode = tvItems.Nodes.Item(0).Nodes.Item(0)
         End If
     End Sub
 
@@ -282,7 +326,8 @@ Public Class frmMain
         tvItems.Nodes.Add(projectNode)
 
         If Not My.Computer.FileSystem.FileExists(datFile) Then Exit Sub
-        tvItems.Nodes.Item(0).Text = loadData(splitMain.Panel1, datFile)
+        tvItems.Nodes.Item(0).Text = loadSaveFile(splitMain.Panel1, datFile)
+        Me.Text = tvItems.Nodes.Item(0).Text & " - Enid"
         ClearProperties()
         RefreshList()
     End Sub
@@ -355,11 +400,11 @@ Public Class frmMain
         txtX.Text = ""
         txtY.Text = ""
         chkVisible.Checked = False
+        txtProgram.Text = ""
     End Sub
 
     Private Sub SetProperties(ByVal control As Button)
         txtText.Text = control.Text
-        txtPath.Text = control.Tag
         txtColor.Text = ColorToHex(control.BackColor)
         txttColor.Text = ColorToHex(control.ForeColor)
         txtWidth.Text = control.Width
@@ -367,9 +412,13 @@ Public Class frmMain
         txtX.Text = control.Location.X
         txtY.Text = control.Location.Y
         chkVisible.Checked = control.Visible
+
+        Dim buffer() As String = Split(control.Tag, "|")
+        txtPath.Text = buffer(0)
+        txtProgram.Text = buffer(1)
     End Sub
 
-    Private Sub PaintEllipsis(ByVal sender As System.Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles btnPath.Paint
+    Private Sub PaintEllipsis(ByVal sender As System.Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles btnPath.Paint, btnProgram.Paint
         If splitSide.Panel2.Enabled Then
             e.Graphics.DrawString("...", New Font("Microsoft Sans Serif", 8.25, FontStyle.Regular, GraphicsUnit.Point, 0), Brushes.White, 4, 1)
         Else
@@ -382,6 +431,14 @@ Public Class frmMain
         openDialog.FileName = RemovePath(txtPath.Text)
         If openDialog.ShowDialog() = Windows.Forms.DialogResult.OK Then
             txtPath.Text = openDialog.FileName
+        End If
+    End Sub
+
+    Private Sub btnProgram_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnProgram.Click
+        openDialog.InitialDirectory = RemoveFile(txtProgram.Text)
+        openDialog.FileName = RemovePath(txtProgram.Text)
+        If openDialog.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            txtProgram.Text = openDialog.FileName
         End If
     End Sub
 
@@ -406,7 +463,7 @@ Public Class frmMain
         If HexToColor(control.Text) = Color.Transparent Then e.Cancel = True
     End Sub
 
-    Private Sub FileValidating(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles txtPath.Validating
+    Private Sub FileValidating(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles txtPath.Validating, txtProgram.Validating
         Dim control As TextBox = sender
         If My.Computer.FileSystem.FileExists(control.Text) = False Then e.Cancel = True
     End Sub
@@ -433,7 +490,18 @@ Public Class frmMain
     Private Sub txtPath_Validated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtPath.Validated
         For Each control As Button In splitMain.Panel1.Controls
             If control.Text = tvItems.SelectedNode.Text Then
-                control.Tag = txtPath.Text
+                Dim buffer() As String = Split(control.Tag, "|")
+                control.Tag = txtPath.Text & "|" & buffer(1)
+                Exit Sub
+            End If
+        Next
+    End Sub
+
+    Private Sub txtProgram_Validated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtProgram.Validated
+        For Each control As Button In splitMain.Panel1.Controls
+            If control.Text = tvItems.SelectedNode.Text Then
+                Dim buffer() As String = Split(control.Tag, "|")
+                control.Tag = buffer(0) & "|" & txtProgram.Text
                 Exit Sub
             End If
         Next

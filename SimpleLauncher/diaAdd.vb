@@ -14,7 +14,7 @@ Public Class diaAdd
                 If My.Computer.FileSystem.FileExists(path) Then
                     Dim newButton As New Button
                     newButton = createButton(frmMain.csButtons)
-                    newButton.Tag = path
+                    newButton.Tag = path & "|"
                     newButton.Text = label
                     frmMain.splitMain.Panel1.Controls.Add(newButton)
                     Dim panelSize As Size = New Size(frmMain.splitMain.SplitterDistance, frmMain.splitMain.Height)
@@ -48,7 +48,7 @@ Public Class diaAdd
                 Dim path As String = item.SubItems.Item(1).Text
                 Dim newItem As New ListViewItem(label)
 
-                newItem.Tag = path
+                newItem.Tag = path & "|"
                 dialogList.lvChoosen.Items.Add(newItem)
             Next
             dialogList.lvChoosen.Items(0).Selected = True
