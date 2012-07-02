@@ -6,7 +6,7 @@ Public Class frmMain
     Public tmpControl As MagicControl
 
     Private isFullScreen As Boolean = False
-    Private datFile As String = My.Application.Info.DirectoryPath.ToString() & "\Enid.dat"
+    Private datFile As String = My.Application.Info.DirectoryPath.ToString() & "\data.xml"
 #End Region
 #Region "Button"
     Public Sub Button_MouseDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs)
@@ -22,10 +22,11 @@ Public Class frmMain
                 Process.Start(dialogSettings.openDialog.FileName, Chr(34) & activeButton.Tag & Chr(34))
             End If
         Else
-            For Each item As TreeNode In tvItems.Nodes
+            For Each item As TreeNode In tvItems.Nodes.Item(0).Nodes
+                If item Is Nothing Then Continue For
                 If activeButton.Text = item.Text Then
                     tvItems.SelectedNode = item
-                    SetProperties(activeButton)
+                    Exit Sub
                 End If
             Next
         End If
@@ -68,26 +69,7 @@ Public Class frmMain
 
     Private Sub tbtnSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbtnSave.Click
         splitMain.Panel1.Cursor = Cursors.WaitCursor
-        With My.Computer.FileSystem
-            .WriteAllText(datFile, My.Application.Info.Version.Major & "." & My.Application.Info.Version.Minor & vbCrLf, False)
-            .WriteAllText(datFile, dialogSettings.numCols.Value.ToString & "|" & dialogSettings.numRows.Value.ToString & vbCrLf, True)
-            .WriteAllText(datFile, dialogSettings.chkEnAuto.Checked.ToString & vbCrLf, True)
-            .WriteAllText(datFile, dialogSettings.openDialog.FileName & vbCrLf, True)
-            .WriteAllText(datFile, lastPoint.X & "|" & lastPoint.Y & vbCrLf, True)
-            .WriteAllText(datFile, lastSize.Width & "|" & lastSize.Height & vbCrLf, True)
-            .WriteAllText(datFile, Me.Width & "|" & Me.Height & vbCrLf, True)
-
-            On Error Resume Next
-            For Each control As Button In splitMain.Panel1.Controls
-                .WriteAllText(datFile, control.Tag & "|" & _
-                              control.Text & "|" & _
-                              control.Location.X & "|" & _
-                              control.Location.Y & "|" & _
-                              control.Width & "|" & _
-                              control.Height & "|" & _
-                              control.Visible & vbCrLf, True)
-            Next
-        End With
+        writeSaveFile(splitMain.Panel1, datFile, tvItems.Nodes.Item(0).Text)
         splitMain.Panel1.Cursor = Cursors.Default
     End Sub
 #End Region
@@ -155,7 +137,7 @@ Public Class frmMain
         Dim selected As String = ""
         If Not tvItems.SelectedNode Is Nothing Then selected = tvItems.SelectedNode.Text
 
-        tvItems.Nodes.Clear()
+        tvItems.Nodes(0).Nodes.Clear()
         For Each control As Button In splitMain.Panel1.Controls
             Dim item As New TreeNode
             item.Text = control.Text
@@ -169,9 +151,10 @@ Public Class frmMain
                 item.SelectedImageKey = "blank"
             End If
 
-            tvItems.Nodes.Add(item)
+            tvItems.Nodes.Item(0).Nodes.Add(item)
             If selected = item.Text Then tvItems.SelectedNode = item
         Next
+        tvItems.Nodes.Item(0).Expand()
         tvItems.EndUpdate()
     End Sub
 
@@ -190,16 +173,16 @@ Public Class frmMain
     End Sub
 
     Private Sub tvItems_AfterSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles tvItems.AfterSelect
-        For Each control As Button In splitMain.Panel1.Controls
-            If control.Text = e.Node.Text Then
-                SetProperties(control)
-                Exit Sub
-            End If
-        Next
-    End Sub
-
-    Private Sub tvItems_BeforeSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewCancelEventArgs) Handles tvItems.BeforeSelect
-        If isNodeButton(e.Node) = False Then e.Cancel = True
+        If isNodeButton(e.Node) Then
+            For Each control As Button In splitMain.Panel1.Controls
+                If control.Text = e.Node.Text Then
+                    SetProperties(control)
+                    Exit Sub
+                End If
+            Next
+        Else
+            ClearProperties()
+        End If
     End Sub
 
     Private Sub tvItems_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles tvItems.KeyDown
@@ -293,62 +276,13 @@ Public Class frmMain
         PrepareImageList()
         splitMain.Panel1.BackColor = Color.FromArgb(255, 60, 70, 75)
 
+        Dim projectNode As New TreeNode("Untitled")
+        projectNode.ImageKey = "folder"
+        projectNode.SelectedImageKey = "folder"
+        tvItems.Nodes.Add(projectNode)
+
         If Not My.Computer.FileSystem.FileExists(datFile) Then Exit Sub
-
-        Dim streamReader As New StreamReader(datFile)
-        Dim line As String
-        Dim curline As Integer = 0
-        Dim buffer() As String
-
-        Do
-            line = streamReader.ReadLine()
-            Select Case curline
-                Case 0
-                    If line <> My.Application.Info.Version.Major & "." & My.Application.Info.Version.Minor Then
-                        If MsgBox("Old save file detected! Would you like to delete it?", MsgBoxStyle.Exclamation + MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
-                            streamReader.Close()
-                            My.Computer.FileSystem.DeleteFile(datFile)
-                        End If
-                        Exit Sub
-                    End If
-                Case 1
-                    buffer = Split(line, "|")
-                    dialogSettings.numCols.Value = CInt(buffer(0))
-                    dialogSettings.numRows.Value = CInt(buffer(1))
-                Case 2
-                    If line = "True" Then dialogSettings.chkEnAuto.Checked = True
-                Case 3
-                    dialogSettings.openDialog.FileName = line
-                Case 4
-                    buffer = Split(line, "|")
-                    lastPoint.X = CInt(buffer(0))
-                    lastPoint.Y = CInt(buffer(1))
-                Case 5
-                    buffer = Split(line, "|")
-                    lastSize.Width = CInt(buffer(0))
-                    lastSize.Height = CInt(buffer(1))
-                Case 6
-                    buffer = Split(line, "|")
-                    Me.Width = CInt(buffer(0))
-                    Me.Height = CInt(buffer(1))
-                Case Else
-                    If line = "" Then Exit Do
-                    buffer = Split(line, "|")
-
-                    Dim newButton As New Button
-                    newButton = createButton(csButtons)
-                    newButton.Visible = CBool(buffer(6))
-                    newButton.Size = New Size(buffer(4), buffer(5))
-                    newButton.Location = New Point(buffer(2), buffer(3))
-                    newButton.Tag = buffer(0)
-                    newButton.Text = buffer(1)
-
-                    splitMain.Panel1.Controls.Add(newButton)
-                    tmpControl = New MagicControl(newButton)
-            End Select
-            curline += 1
-        Loop
-        streamReader.Close()
+        tvItems.Nodes.Item(0).Text = loadData(splitMain.Panel1, datFile)
         ClearProperties()
         RefreshList()
     End Sub
@@ -469,16 +403,12 @@ Public Class frmMain
 
     Private Sub ColorValidating(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles txttColor.Validating, txtColor.Validating
         Dim control As TextBox = sender
-        If control.Text.Length <> 6 Then e.Cancel = True : Exit Sub
         If HexToColor(control.Text) = Color.Transparent Then e.Cancel = True
     End Sub
 
     Private Sub FileValidating(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles txtPath.Validating
         Dim control As TextBox = sender
-        If My.Computer.FileSystem.FileExists(control.Text) = False Then
-            MsgBox("That file does not exist!", MsgBoxStyle.Critical)
-            e.Cancel = True
-        End If
+        If My.Computer.FileSystem.FileExists(control.Text) = False Then e.Cancel = True
     End Sub
 
     Private Sub EmptyValidating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles txtText.Validating

@@ -149,7 +149,7 @@ Partial Class frmMain
         Me.splitMain.Panel2.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.splitMain.Panel2.Controls.Add(Me.splitSide)
         Me.splitMain.Size = New System.Drawing.Size(1323, 726)
-        Me.splitMain.SplitterDistance = 1125
+        Me.splitMain.SplitterDistance = 1127
         Me.splitMain.SplitterWidth = 3
         Me.splitMain.TabIndex = 0
         Me.splitMain.TabStop = False
@@ -159,6 +159,7 @@ Partial Class frmMain
         Me.splitSide.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.splitSide.Dock = System.Windows.Forms.DockStyle.Fill
         Me.splitSide.FixedPanel = System.Windows.Forms.FixedPanel.Panel2
+        Me.splitSide.IsSplitterFixed = True
         Me.splitSide.Location = New System.Drawing.Point(0, 0)
         Me.splitSide.Margin = New System.Windows.Forms.Padding(2)
         Me.splitSide.Name = "splitSide"
@@ -189,9 +190,9 @@ Partial Class frmMain
         Me.splitSide.Panel2.Controls.Add(Me.lbltColor)
         Me.splitSide.Panel2.Controls.Add(Me.lblPath)
         Me.splitSide.Panel2.Controls.Add(Me.lblText)
-        Me.splitSide.Panel2MinSize = 147
-        Me.splitSide.Size = New System.Drawing.Size(195, 726)
-        Me.splitSide.SplitterDistance = 461
+        Me.splitSide.Panel2MinSize = 100
+        Me.splitSide.Size = New System.Drawing.Size(193, 726)
+        Me.splitSide.SplitterDistance = 582
         Me.splitSide.SplitterIncrement = 17
         Me.splitSide.SplitterWidth = 3
         Me.splitSide.TabIndex = 0
@@ -210,7 +211,7 @@ Partial Class frmMain
         Me.tvItems.Name = "tvItems"
         Me.tvItems.SelectedImageIndex = 0
         Me.tvItems.ShowRootLines = False
-        Me.tvItems.Size = New System.Drawing.Size(193, 459)
+        Me.tvItems.Size = New System.Drawing.Size(191, 580)
         Me.tvItems.TabIndex = 0
         '
         'imglstTree
@@ -228,7 +229,7 @@ Partial Class frmMain
         Me.chkVisible.FlatAppearance.CheckedBackColor = System.Drawing.SystemColors.ActiveCaption
         Me.chkVisible.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.chkVisible.ForeColor = System.Drawing.Color.Black
-        Me.chkVisible.Location = New System.Drawing.Point(154, 113)
+        Me.chkVisible.Location = New System.Drawing.Point(152, 117)
         Me.chkVisible.Name = "chkVisible"
         Me.chkVisible.Size = New System.Drawing.Size(12, 11)
         Me.chkVisible.TabIndex = 3
@@ -240,7 +241,7 @@ Partial Class frmMain
         Me.btnPath.FlatAppearance.BorderColor = System.Drawing.SystemColors.ControlDarkDark
         Me.btnPath.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnPath.ForeColor = System.Drawing.Color.White
-        Me.btnPath.Location = New System.Drawing.Point(172, 30)
+        Me.btnPath.Location = New System.Drawing.Point(163, 34)
         Me.btnPath.Name = "btnPath"
         Me.btnPath.Size = New System.Drawing.Size(21, 20)
         Me.btnPath.TabIndex = 2
@@ -252,7 +253,7 @@ Partial Class frmMain
         Me.txtHeight.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.txtHeight.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtHeight.ForeColor = System.Drawing.Color.White
-        Me.txtHeight.Location = New System.Drawing.Point(130, 82)
+        Me.txtHeight.Location = New System.Drawing.Point(128, 86)
         Me.txtHeight.MaxLength = 4
         Me.txtHeight.Name = "txtHeight"
         Me.txtHeight.Size = New System.Drawing.Size(30, 20)
@@ -264,7 +265,7 @@ Partial Class frmMain
         Me.txtY.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.txtY.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtY.ForeColor = System.Drawing.Color.White
-        Me.txtY.Location = New System.Drawing.Point(79, 108)
+        Me.txtY.Location = New System.Drawing.Point(77, 112)
         Me.txtY.MaxLength = 4
         Me.txtY.Name = "txtY"
         Me.txtY.Size = New System.Drawing.Size(30, 20)
@@ -276,7 +277,7 @@ Partial Class frmMain
         Me.txtWidth.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.txtWidth.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtWidth.ForeColor = System.Drawing.Color.White
-        Me.txtWidth.Location = New System.Drawing.Point(44, 82)
+        Me.txtWidth.Location = New System.Drawing.Point(42, 86)
         Me.txtWidth.MaxLength = 4
         Me.txtWidth.Name = "txtWidth"
         Me.txtWidth.Size = New System.Drawing.Size(30, 20)
@@ -288,7 +289,7 @@ Partial Class frmMain
         Me.txtX.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.txtX.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtX.ForeColor = System.Drawing.Color.White
-        Me.txtX.Location = New System.Drawing.Point(23, 108)
+        Me.txtX.Location = New System.Drawing.Point(21, 112)
         Me.txtX.MaxLength = 4
         Me.txtX.Name = "txtX"
         Me.txtX.Size = New System.Drawing.Size(30, 20)
@@ -300,7 +301,7 @@ Partial Class frmMain
         Me.txtPath.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.txtPath.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtPath.ForeColor = System.Drawing.Color.White
-        Me.txtPath.Location = New System.Drawing.Point(37, 30)
+        Me.txtPath.Location = New System.Drawing.Point(35, 34)
         Me.txtPath.Name = "txtPath"
         Me.txtPath.Size = New System.Drawing.Size(129, 20)
         Me.txtPath.TabIndex = 1
@@ -311,7 +312,7 @@ Partial Class frmMain
         Me.txtColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtColor.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtColor.ForeColor = System.Drawing.Color.White
-        Me.txtColor.Location = New System.Drawing.Point(148, 56)
+        Me.txtColor.Location = New System.Drawing.Point(139, 60)
         Me.txtColor.MaxLength = 6
         Me.txtColor.Name = "txtColor"
         Me.txtColor.Size = New System.Drawing.Size(45, 20)
@@ -323,7 +324,7 @@ Partial Class frmMain
         Me.txttColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txttColor.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txttColor.ForeColor = System.Drawing.Color.White
-        Me.txttColor.Location = New System.Drawing.Point(62, 56)
+        Me.txttColor.Location = New System.Drawing.Point(60, 60)
         Me.txttColor.MaxLength = 6
         Me.txttColor.Name = "txttColor"
         Me.txttColor.Size = New System.Drawing.Size(45, 20)
@@ -335,16 +336,16 @@ Partial Class frmMain
         Me.txtText.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtText.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtText.ForeColor = System.Drawing.Color.White
-        Me.txtText.Location = New System.Drawing.Point(37, 3)
+        Me.txtText.Location = New System.Drawing.Point(35, 7)
         Me.txtText.Name = "txtText"
-        Me.txtText.Size = New System.Drawing.Size(156, 20)
+        Me.txtText.Size = New System.Drawing.Size(149, 20)
         Me.txtText.TabIndex = 1
         '
         'lblHeight
         '
         Me.lblHeight.AutoSize = True
         Me.lblHeight.ForeColor = System.Drawing.Color.White
-        Me.lblHeight.Location = New System.Drawing.Point(86, 86)
+        Me.lblHeight.Location = New System.Drawing.Point(84, 90)
         Me.lblHeight.Name = "lblHeight"
         Me.lblHeight.Size = New System.Drawing.Size(38, 13)
         Me.lblHeight.TabIndex = 0
@@ -354,7 +355,7 @@ Partial Class frmMain
         '
         Me.lblY.AutoSize = True
         Me.lblY.ForeColor = System.Drawing.Color.White
-        Me.lblY.Location = New System.Drawing.Point(59, 112)
+        Me.lblY.Location = New System.Drawing.Point(57, 116)
         Me.lblY.Name = "lblY"
         Me.lblY.Size = New System.Drawing.Size(14, 13)
         Me.lblY.TabIndex = 0
@@ -364,7 +365,7 @@ Partial Class frmMain
         '
         Me.lblWidth.AutoSize = True
         Me.lblWidth.ForeColor = System.Drawing.Color.White
-        Me.lblWidth.Location = New System.Drawing.Point(3, 86)
+        Me.lblWidth.Location = New System.Drawing.Point(1, 90)
         Me.lblWidth.Name = "lblWidth"
         Me.lblWidth.Size = New System.Drawing.Size(35, 13)
         Me.lblWidth.TabIndex = 0
@@ -374,7 +375,7 @@ Partial Class frmMain
         '
         Me.Label1.AutoSize = True
         Me.Label1.ForeColor = System.Drawing.Color.White
-        Me.Label1.Location = New System.Drawing.Point(115, 112)
+        Me.Label1.Location = New System.Drawing.Point(113, 116)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(37, 13)
         Me.Label1.TabIndex = 0
@@ -384,7 +385,7 @@ Partial Class frmMain
         '
         Me.lblX.AutoSize = True
         Me.lblX.ForeColor = System.Drawing.Color.White
-        Me.lblX.Location = New System.Drawing.Point(3, 112)
+        Me.lblX.Location = New System.Drawing.Point(1, 116)
         Me.lblX.Name = "lblX"
         Me.lblX.Size = New System.Drawing.Size(14, 13)
         Me.lblX.TabIndex = 0
@@ -394,7 +395,7 @@ Partial Class frmMain
         '
         Me.lblColor.AutoSize = True
         Me.lblColor.ForeColor = System.Drawing.Color.White
-        Me.lblColor.Location = New System.Drawing.Point(111, 60)
+        Me.lblColor.Location = New System.Drawing.Point(107, 64)
         Me.lblColor.Name = "lblColor"
         Me.lblColor.Size = New System.Drawing.Size(31, 13)
         Me.lblColor.TabIndex = 0
@@ -404,7 +405,7 @@ Partial Class frmMain
         '
         Me.lbltColor.AutoSize = True
         Me.lbltColor.ForeColor = System.Drawing.Color.White
-        Me.lbltColor.Location = New System.Drawing.Point(3, 60)
+        Me.lbltColor.Location = New System.Drawing.Point(1, 64)
         Me.lbltColor.Name = "lbltColor"
         Me.lbltColor.Size = New System.Drawing.Size(55, 13)
         Me.lbltColor.TabIndex = 0
@@ -414,7 +415,7 @@ Partial Class frmMain
         '
         Me.lblPath.AutoSize = True
         Me.lblPath.ForeColor = System.Drawing.Color.White
-        Me.lblPath.Location = New System.Drawing.Point(3, 34)
+        Me.lblPath.Location = New System.Drawing.Point(1, 38)
         Me.lblPath.Name = "lblPath"
         Me.lblPath.Size = New System.Drawing.Size(29, 13)
         Me.lblPath.TabIndex = 0
@@ -424,7 +425,7 @@ Partial Class frmMain
         '
         Me.lblText.AutoSize = True
         Me.lblText.ForeColor = System.Drawing.Color.White
-        Me.lblText.Location = New System.Drawing.Point(3, 7)
+        Me.lblText.Location = New System.Drawing.Point(1, 11)
         Me.lblText.Name = "lblText"
         Me.lblText.Size = New System.Drawing.Size(28, 13)
         Me.lblText.TabIndex = 0

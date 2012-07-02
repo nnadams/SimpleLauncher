@@ -34,6 +34,7 @@ Module Functions
     Public Function createButton(ByRef contextmenu As ContextMenuStrip, Optional ByVal path As String = "") As Button
         Dim newButton As New Button
         newButton.AutoSize = True
+        newButton.MinimumSize = New Size(23, 23)
         newButton.Text = RemovePath(path)
         newButton.ContextMenuStrip = contextmenu
         newButton.Tag = path
