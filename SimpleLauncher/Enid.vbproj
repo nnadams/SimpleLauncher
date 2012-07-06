@@ -82,6 +82,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="customTabControl\customTabControl.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="customTabControl\NativeScroller.vb" />
+    <Compile Include="customTabControl\TabScroller.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="diaAdd.Designer.vb">
       <DependentUpon>diaAdd.vb</DependentUpon>
     </Compile>

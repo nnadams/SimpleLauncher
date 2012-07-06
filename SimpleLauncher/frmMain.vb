@@ -74,9 +74,9 @@ Public Class frmMain
     End Sub
 
     Private Sub tbtnSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbtnSave.Click
-        splitMain.Panel1.Cursor = Cursors.WaitCursor
-        writeSaveFile(splitMain.Panel1, datFile, tvItems.Nodes.Item(0).Text)
-        splitMain.Panel1.Cursor = Cursors.Default
+        tbMain.SelectedTab.Cursor = Cursors.WaitCursor
+        writeSaveFile(tbMain.SelectedTab, datFile, tvItems.Nodes.Item(0).Text)
+        tbMain.SelectedTab.Cursor = Cursors.Default
     End Sub
 #End Region
 #Region "ContextMenus"
@@ -124,7 +124,7 @@ Public Class frmMain
         activeButton = strip.SourceControl
 
         If MsgBox("Really delete '" & activeButton.Text & "'?", MsgBoxStyle.YesNo + MsgBoxStyle.Information, "Delete?") = MsgBoxResult.Yes Then
-            splitMain.Panel1.Controls.Remove(activeButton)
+            tbMain.SelectedTab.Controls.Remove(activeButton)
         End If
         RefreshList()
         ClearProperties()
@@ -136,19 +136,19 @@ Public Class frmMain
 #End Region
 #Region "tvItems"
     Private Function isNodeButton(ByVal node As TreeNode) As Boolean
-        For Each control As Button In splitMain.Panel1.Controls
+        For Each control As Button In tbMain.SelectedTab.Controls
             If control.Text = node.Text Then Return True
         Next
         Return False
     End Function
 
     Private Sub RefreshList()
-        tvItems.BeginUpdate()
         Dim selected As String = ""
         If Not tvItems.SelectedNode Is Nothing Then selected = tvItems.SelectedNode.Text
 
+        LockWindowUpdate(tvItems.Handle)
         tvItems.Nodes(0).Nodes.Clear()
-        For Each control As Button In splitMain.Panel1.Controls
+        For Each control As Button In tbMain.SelectedTab.Controls
             Dim item As New TreeNode
             item.Text = control.Text
             item.BackColor = control.BackColor
@@ -166,16 +166,16 @@ Public Class frmMain
             If selected = item.Text Then tvItems.SelectedNode = item
         Next
         tvItems.Nodes.Item(0).Expand()
-        tvItems.EndUpdate()
+        LockWindowUpdate(0)
     End Sub
 
     Private Sub RemoveSelected()
         If tvItems.SelectedNode Is Nothing Then Exit Sub
         If isNodeButton(tvItems.SelectedNode) Then
-            For Each control As Button In splitMain.Panel1.Controls
+            For Each control As Button In tbMain.SelectedTab.Controls
                 If control.Text = tvItems.SelectedNode.Text Then
                     If MsgBox("Really delete '" & control.Text & "'?", MsgBoxStyle.YesNo + MsgBoxStyle.Information, "Delete?") = MsgBoxResult.Yes Then
-                        splitMain.Panel1.Controls.Remove(control)
+                        tbMain.SelectedTab.Controls.Remove(control)
                         RefreshList()
                         ClearProperties()
                     End If
@@ -190,9 +190,10 @@ Public Class frmMain
         Else
             If e.Node Is tvItems.Nodes.Item(0) Then
                 Me.Text = e.Label & " - Enid"
+                tbMain.SelectedTab.Text = e.Label
                 Exit Sub
             End If
-            For Each control As Button In splitMain.Panel1.Controls
+            For Each control As Button In tbMain.SelectedTab.Controls
                 If control.Text = e.Node.Text Then
                     control.Text = e.Label
                     tvItems.LabelEdit = False
@@ -204,7 +205,7 @@ Public Class frmMain
 
     Private Sub tvItems_AfterSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles tvItems.AfterSelect
         If isNodeButton(e.Node) Then
-            For Each control As Button In splitMain.Panel1.Controls
+            For Each control As Button In tbMain.SelectedTab.Controls
                 If control.Text = e.Node.Text Then
                     splitSide.Panel2.Enabled = True
                     SetProperties(control)
@@ -251,7 +252,7 @@ Public Class frmMain
     End Sub
 
     Private Function searchForExisting(ByVal text As String) As Boolean
-        For Each control As Button In splitMain.Panel1.Controls
+        For Each control As Button In tbMain.SelectedTab.Controls
             If control.Text = text Then
                 Return True
             End If
@@ -277,7 +278,7 @@ Public Class frmMain
                 Else
                     Dim newButton As New Button
                     newButton = createButton(csButtons, filePaths(fileNum))
-                    splitMain.Panel1.Controls.Add(newButton)
+                    tbMain.SelectedTab.Controls.Add(newButton)
 
                     Dim panelSize As Size = New Size(splitMain.SplitterDistance, splitMain.Height)
                     Dim newLocation As Point = GetNewLocation(lastPoint, lastSize, newButton.Size, panelSize)
@@ -291,7 +292,7 @@ Public Class frmMain
 
                         lastPoint = New Point(-1, -1)
                         lastSize = New Size(-1, -1)
-                        splitMain.Panel1.Controls.Remove(newButton)
+                        tbMain.SelectedTab.Controls.Remove(newButton)
                         RefreshList()
                         Exit Sub
                     Else
@@ -318,7 +319,7 @@ Public Class frmMain
 
     Private Sub frmMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         PrepareImageList()
-        splitMain.Panel1.BackColor = Color.FromArgb(255, 60, 70, 75)
+        tbMain.SelectedTab.BackColor = Color.FromArgb(255, 60, 70, 75)
 
         Dim projectNode As New TreeNode("Untitled")
         projectNode.ImageKey = "folder"
@@ -326,8 +327,9 @@ Public Class frmMain
         tvItems.Nodes.Add(projectNode)
 
         If Not My.Computer.FileSystem.FileExists(datFile) Then Exit Sub
-        tvItems.Nodes.Item(0).Text = loadSaveFile(splitMain.Panel1, datFile)
+        tvItems.Nodes.Item(0).Text = loadSaveFile(tbMain.SelectedTab, datFile)
         Me.Text = tvItems.Nodes.Item(0).Text & " - Enid"
+        tbMain.SelectedTab.Text = tvItems.Nodes.Item(0).Text
         ClearProperties()
         RefreshList()
     End Sub
@@ -349,7 +351,7 @@ Public Class frmMain
     End Sub
 
     Private Sub splitMain_Panel1_Click(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles splitMain.Panel1.Click
-        If splitMain.Panel1.Cursor <> Cursors.Cross Or e.Button <> Windows.Forms.MouseButtons.Left Then Exit Sub
+        If tbMain.SelectedTab.Cursor <> Cursors.Cross Or e.Button <> Windows.Forms.MouseButtons.Left Then Exit Sub
 
         Dim newButton As New Button
         Dim curItem As ListViewItem
@@ -363,14 +365,14 @@ Public Class frmMain
         newButton = createButton(csButtons)
         newButton.Text = curItem.Text
         newButton.Tag = curItem.Tag
-        splitMain.Panel1.Controls.Add(newButton)
+        tbMain.SelectedTab.Controls.Add(newButton)
         newButton.Location = New Point(e.X - (newButton.Width / 2), e.Y - (newButton.Height / 2))
         tmpControl = New MagicControl(newButton)
 
         dialogList.lvChoosen.Items.Remove(curItem)
         If dialogList.lvChoosen.Items.Count = 0 Then
             dialogList.Close()
-            splitMain.Panel1.Cursor = Cursors.Default
+            tbMain.SelectedTab.Cursor = Cursors.Default
         Else
             dialogList.lvChoosen.Items(0).Selected = True
         End If
@@ -479,7 +481,7 @@ Public Class frmMain
     End Sub
 
     Private Sub txtText_Validated(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtText.Validated
-        For Each control As Button In splitMain.Panel1.Controls
+        For Each control As Button In tbMain.SelectedTab.Controls
             If control.Text = tvItems.SelectedNode.Text Then
                 control.Text = txtText.Text
                 Exit Sub
@@ -488,7 +490,7 @@ Public Class frmMain
     End Sub
 
     Private Sub txtPath_Validated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtPath.Validated
-        For Each control As Button In splitMain.Panel1.Controls
+        For Each control As Button In tbMain.SelectedTab.Controls
             If control.Text = tvItems.SelectedNode.Text Then
                 Dim buffer() As String = Split(control.Tag, "|")
                 control.Tag = txtPath.Text & "|" & buffer(1)
@@ -498,7 +500,7 @@ Public Class frmMain
     End Sub
 
     Private Sub txtProgram_Validated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtProgram.Validated
-        For Each control As Button In splitMain.Panel1.Controls
+        For Each control As Button In tbMain.SelectedTab.Controls
             If control.Text = tvItems.SelectedNode.Text Then
                 Dim buffer() As String = Split(control.Tag, "|")
                 control.Tag = buffer(0) & "|" & txtProgram.Text
@@ -508,7 +510,7 @@ Public Class frmMain
     End Sub
 
     Private Sub SizeValidated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtWidth.Validated, txtHeight.Validated
-        For Each control As Button In splitMain.Panel1.Controls
+        For Each control As Button In tbMain.SelectedTab.Controls
             If control.Text = tvItems.SelectedNode.Text Then
                 control.Size = New Size(CInt(txtWidth.Text), CInt(txtHeight.Text))
                 Exit Sub
@@ -517,7 +519,7 @@ Public Class frmMain
     End Sub
 
     Private Sub XYValidated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtX.Validated, txtY.Validated
-        For Each control As Button In splitMain.Panel1.Controls
+        For Each control As Button In tbMain.SelectedTab.Controls
             If control.Text = tvItems.SelectedNode.Text Then
                 control.Location = New Point(CInt(txtX.Text), CInt(txtY.Text))
                 Exit Sub
@@ -526,7 +528,7 @@ Public Class frmMain
     End Sub
 
     Private Sub ColorsValidated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txttColor.Validated, txtColor.Validated
-        For Each control As Button In splitMain.Panel1.Controls
+        For Each control As Button In tbMain.SelectedTab.Controls
             If control.Text = tvItems.SelectedNode.Text Then
                 control.ForeColor = HexToColor(txttColor.Text)
                 control.BackColor = HexToColor(txtColor.Text)
@@ -539,7 +541,7 @@ Public Class frmMain
 
     Private Sub chkVisible_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkVisible.CheckedChanged
         If tvItems.SelectedNode Is Nothing Then Exit Sub
-        For Each control As Button In splitMain.Panel1.Controls
+        For Each control As Button In tbMain.SelectedTab.Controls
             If control.Text = tvItems.SelectedNode.Text Then
                 control.Visible = chkVisible.Checked
                 RefreshList()
@@ -551,6 +553,11 @@ Public Class frmMain
     Private Sub txttColor_MouseHover(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txttColor.MouseHover, txtColor.MouseHover
         Dim control As Control = sender
         ttColorMsg.Show("Double-click to view a color picker", control)
+    End Sub
+
+    Private Sub PathProg_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtPath.TextChanged, txtProgram.TextChanged
+        Dim control As Control = sender
+        control.Tag = txtPath.Text & "|" & txtProgram.Text
     End Sub
 #End Region
 End Class

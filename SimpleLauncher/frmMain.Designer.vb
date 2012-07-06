@@ -67,10 +67,13 @@ Partial Class frmMain
         Me.ttColorMsg = New System.Windows.Forms.ToolTip(Me.components)
         Me.csTreeNodes = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.csTreeNodesRemove = New System.Windows.Forms.ToolStripMenuItem
+        Me.tbMain = New Enid.customTabControl
+        Me.TabPage1 = New System.Windows.Forms.TabPage
         Me.csButtons.SuspendLayout()
         Me.tsContainer.ContentPanel.SuspendLayout()
         Me.tsContainer.LeftToolStripPanel.SuspendLayout()
         Me.tsContainer.SuspendLayout()
+        Me.splitMain.Panel1.SuspendLayout()
         Me.splitMain.Panel2.SuspendLayout()
         Me.splitMain.SuspendLayout()
         Me.splitSide.Panel1.SuspendLayout()
@@ -78,6 +81,7 @@ Partial Class frmMain
         Me.splitSide.SuspendLayout()
         Me.tsMain.SuspendLayout()
         Me.csTreeNodes.SuspendLayout()
+        Me.tbMain.SuspendLayout()
         Me.SuspendLayout()
         '
         'csButtons
@@ -116,7 +120,7 @@ Partial Class frmMain
         '
         Me.tsContainer.ContentPanel.Controls.Add(Me.splitMain)
         Me.tsContainer.ContentPanel.Margin = New System.Windows.Forms.Padding(2)
-        Me.tsContainer.ContentPanel.Size = New System.Drawing.Size(1326, 730)
+        Me.tsContainer.ContentPanel.Size = New System.Drawing.Size(1360, 730)
         '
         'tsContainer.LeftToolStripPanel
         '
@@ -131,31 +135,30 @@ Partial Class frmMain
         '
         Me.tsContainer.RightToolStripPanel.BackgroundImage = Global.Enid.My.Resources.Resources.background
         Me.tsContainer.RightToolStripPanelVisible = False
-        Me.tsContainer.Size = New System.Drawing.Size(1350, 730)
+        Me.tsContainer.Size = New System.Drawing.Size(1384, 730)
         Me.tsContainer.TabIndex = 2
         Me.tsContainer.TopToolStripPanelVisible = False
         '
         'splitMain
         '
-        Me.splitMain.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.splitMain.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.splitMain.Dock = System.Windows.Forms.DockStyle.Fill
         Me.splitMain.FixedPanel = System.Windows.Forms.FixedPanel.Panel2
-        Me.splitMain.Location = New System.Drawing.Point(0, 2)
+        Me.splitMain.Location = New System.Drawing.Point(0, 0)
         Me.splitMain.Margin = New System.Windows.Forms.Padding(2)
         Me.splitMain.Name = "splitMain"
         '
         'splitMain.Panel1
         '
+        Me.splitMain.Panel1.Controls.Add(Me.tbMain)
         '
         'splitMain.Panel2
         '
         Me.splitMain.Panel2.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.splitMain.Panel2.Controls.Add(Me.splitSide)
         Me.splitMain.Panel2MinSize = 125
-        Me.splitMain.Size = New System.Drawing.Size(1323, 726)
-        Me.splitMain.SplitterDistance = 1101
+        Me.splitMain.Size = New System.Drawing.Size(1360, 730)
+        Me.splitMain.SplitterDistance = 1140
         Me.splitMain.SplitterIncrement = 10
         Me.splitMain.SplitterWidth = 3
         Me.splitMain.TabIndex = 0
@@ -201,8 +204,8 @@ Partial Class frmMain
         Me.splitSide.Panel2.Controls.Add(Me.lblPath)
         Me.splitSide.Panel2.Controls.Add(Me.lblText)
         Me.splitSide.Panel2.Enabled = False
-        Me.splitSide.Size = New System.Drawing.Size(219, 726)
-        Me.splitSide.SplitterDistance = 550
+        Me.splitSide.Size = New System.Drawing.Size(217, 730)
+        Me.splitSide.SplitterDistance = 556
         Me.splitSide.SplitterIncrement = 17
         Me.splitSide.SplitterWidth = 3
         Me.splitSide.TabIndex = 0
@@ -221,7 +224,7 @@ Partial Class frmMain
         Me.tvItems.Name = "tvItems"
         Me.tvItems.SelectedImageIndex = 0
         Me.tvItems.ShowRootLines = False
-        Me.tvItems.Size = New System.Drawing.Size(217, 548)
+        Me.tvItems.Size = New System.Drawing.Size(215, 554)
         Me.tvItems.TabIndex = 0
         '
         'imglstTree
@@ -240,7 +243,7 @@ Partial Class frmMain
         Me.chkVisible.FlatAppearance.CheckedBackColor = System.Drawing.SystemColors.ActiveCaption
         Me.chkVisible.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.chkVisible.ForeColor = System.Drawing.Color.Black
-        Me.chkVisible.Location = New System.Drawing.Point(178, 119)
+        Me.chkVisible.Location = New System.Drawing.Point(177, 119)
         Me.chkVisible.Name = "chkVisible"
         Me.chkVisible.Size = New System.Drawing.Size(12, 11)
         Me.chkVisible.TabIndex = 3
@@ -253,7 +256,7 @@ Partial Class frmMain
         Me.btnProgram.FlatAppearance.BorderColor = System.Drawing.SystemColors.ControlDarkDark
         Me.btnProgram.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnProgram.ForeColor = System.Drawing.Color.White
-        Me.btnProgram.Location = New System.Drawing.Point(188, 143)
+        Me.btnProgram.Location = New System.Drawing.Point(186, 143)
         Me.btnProgram.Name = "btnProgram"
         Me.btnProgram.Size = New System.Drawing.Size(21, 20)
         Me.btnProgram.TabIndex = 2
@@ -267,7 +270,7 @@ Partial Class frmMain
         Me.btnPath.FlatAppearance.BorderColor = System.Drawing.SystemColors.ControlDarkDark
         Me.btnPath.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnPath.ForeColor = System.Drawing.Color.White
-        Me.btnPath.Location = New System.Drawing.Point(188, 36)
+        Me.btnPath.Location = New System.Drawing.Point(186, 36)
         Me.btnPath.Name = "btnPath"
         Me.btnPath.Size = New System.Drawing.Size(21, 20)
         Me.btnPath.TabIndex = 2
@@ -280,7 +283,7 @@ Partial Class frmMain
         Me.txtHeight.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.txtHeight.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtHeight.ForeColor = System.Drawing.Color.White
-        Me.txtHeight.Location = New System.Drawing.Point(157, 88)
+        Me.txtHeight.Location = New System.Drawing.Point(156, 88)
         Me.txtHeight.MaxLength = 4
         Me.txtHeight.Name = "txtHeight"
         Me.txtHeight.Size = New System.Drawing.Size(30, 20)
@@ -293,7 +296,7 @@ Partial Class frmMain
         Me.txtY.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.txtY.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtY.ForeColor = System.Drawing.Color.White
-        Me.txtY.Location = New System.Drawing.Point(103, 114)
+        Me.txtY.Location = New System.Drawing.Point(102, 114)
         Me.txtY.MaxLength = 4
         Me.txtY.Name = "txtY"
         Me.txtY.Size = New System.Drawing.Size(30, 20)
@@ -306,7 +309,7 @@ Partial Class frmMain
         Me.txtWidth.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.txtWidth.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtWidth.ForeColor = System.Drawing.Color.White
-        Me.txtWidth.Location = New System.Drawing.Point(71, 88)
+        Me.txtWidth.Location = New System.Drawing.Point(70, 88)
         Me.txtWidth.MaxLength = 4
         Me.txtWidth.Name = "txtWidth"
         Me.txtWidth.Size = New System.Drawing.Size(30, 20)
@@ -319,7 +322,7 @@ Partial Class frmMain
         Me.txtX.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.txtX.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtX.ForeColor = System.Drawing.Color.White
-        Me.txtX.Location = New System.Drawing.Point(47, 114)
+        Me.txtX.Location = New System.Drawing.Point(46, 114)
         Me.txtX.MaxLength = 4
         Me.txtX.Name = "txtX"
         Me.txtX.Size = New System.Drawing.Size(30, 20)
@@ -335,7 +338,7 @@ Partial Class frmMain
         Me.txtProgram.ForeColor = System.Drawing.Color.White
         Me.txtProgram.Location = New System.Drawing.Point(55, 143)
         Me.txtProgram.Name = "txtProgram"
-        Me.txtProgram.Size = New System.Drawing.Size(134, 20)
+        Me.txtProgram.Size = New System.Drawing.Size(132, 20)
         Me.txtProgram.TabIndex = 1
         '
         'txtPath
@@ -347,7 +350,7 @@ Partial Class frmMain
         Me.txtPath.ForeColor = System.Drawing.Color.White
         Me.txtPath.Location = New System.Drawing.Point(35, 36)
         Me.txtPath.Name = "txtPath"
-        Me.txtPath.Size = New System.Drawing.Size(154, 20)
+        Me.txtPath.Size = New System.Drawing.Size(152, 20)
         Me.txtPath.TabIndex = 1
         '
         'txtColor
@@ -357,7 +360,7 @@ Partial Class frmMain
         Me.txtColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtColor.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtColor.ForeColor = System.Drawing.Color.White
-        Me.txtColor.Location = New System.Drawing.Point(155, 62)
+        Me.txtColor.Location = New System.Drawing.Point(154, 62)
         Me.txtColor.MaxLength = 6
         Me.txtColor.Name = "txtColor"
         Me.txtColor.Size = New System.Drawing.Size(45, 20)
@@ -370,7 +373,7 @@ Partial Class frmMain
         Me.txttColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txttColor.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txttColor.ForeColor = System.Drawing.Color.White
-        Me.txttColor.Location = New System.Drawing.Point(76, 62)
+        Me.txttColor.Location = New System.Drawing.Point(75, 62)
         Me.txttColor.MaxLength = 6
         Me.txttColor.Name = "txttColor"
         Me.txttColor.Size = New System.Drawing.Size(45, 20)
@@ -386,7 +389,7 @@ Partial Class frmMain
         Me.txtText.ForeColor = System.Drawing.Color.White
         Me.txtText.Location = New System.Drawing.Point(35, 9)
         Me.txtText.Name = "txtText"
-        Me.txtText.Size = New System.Drawing.Size(174, 20)
+        Me.txtText.Size = New System.Drawing.Size(172, 20)
         Me.txtText.TabIndex = 1
         '
         'lblHeight
@@ -394,7 +397,7 @@ Partial Class frmMain
         Me.lblHeight.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.lblHeight.AutoSize = True
         Me.lblHeight.ForeColor = System.Drawing.Color.White
-        Me.lblHeight.Location = New System.Drawing.Point(113, 92)
+        Me.lblHeight.Location = New System.Drawing.Point(112, 92)
         Me.lblHeight.Name = "lblHeight"
         Me.lblHeight.Size = New System.Drawing.Size(38, 13)
         Me.lblHeight.TabIndex = 0
@@ -405,7 +408,7 @@ Partial Class frmMain
         Me.lblY.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.lblY.AutoSize = True
         Me.lblY.ForeColor = System.Drawing.Color.White
-        Me.lblY.Location = New System.Drawing.Point(83, 118)
+        Me.lblY.Location = New System.Drawing.Point(82, 118)
         Me.lblY.Name = "lblY"
         Me.lblY.Size = New System.Drawing.Size(14, 13)
         Me.lblY.TabIndex = 0
@@ -416,7 +419,7 @@ Partial Class frmMain
         Me.lblWidth.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.lblWidth.AutoSize = True
         Me.lblWidth.ForeColor = System.Drawing.Color.White
-        Me.lblWidth.Location = New System.Drawing.Point(30, 92)
+        Me.lblWidth.Location = New System.Drawing.Point(29, 92)
         Me.lblWidth.Name = "lblWidth"
         Me.lblWidth.Size = New System.Drawing.Size(35, 13)
         Me.lblWidth.TabIndex = 0
@@ -427,7 +430,7 @@ Partial Class frmMain
         Me.Label1.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.Label1.AutoSize = True
         Me.Label1.ForeColor = System.Drawing.Color.White
-        Me.Label1.Location = New System.Drawing.Point(139, 118)
+        Me.Label1.Location = New System.Drawing.Point(138, 118)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(37, 13)
         Me.Label1.TabIndex = 0
@@ -438,7 +441,7 @@ Partial Class frmMain
         Me.lblX.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.lblX.AutoSize = True
         Me.lblX.ForeColor = System.Drawing.Color.White
-        Me.lblX.Location = New System.Drawing.Point(27, 118)
+        Me.lblX.Location = New System.Drawing.Point(26, 118)
         Me.lblX.Name = "lblX"
         Me.lblX.Size = New System.Drawing.Size(14, 13)
         Me.lblX.TabIndex = 0
@@ -449,7 +452,7 @@ Partial Class frmMain
         Me.lblColor.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.lblColor.AutoSize = True
         Me.lblColor.ForeColor = System.Drawing.Color.White
-        Me.lblColor.Location = New System.Drawing.Point(123, 66)
+        Me.lblColor.Location = New System.Drawing.Point(122, 66)
         Me.lblColor.Name = "lblColor"
         Me.lblColor.Size = New System.Drawing.Size(31, 13)
         Me.lblColor.TabIndex = 0
@@ -470,7 +473,7 @@ Partial Class frmMain
         Me.lbltColor.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.lbltColor.AutoSize = True
         Me.lbltColor.ForeColor = System.Drawing.Color.White
-        Me.lbltColor.Location = New System.Drawing.Point(17, 66)
+        Me.lbltColor.Location = New System.Drawing.Point(16, 66)
         Me.lbltColor.Name = "lbltColor"
         Me.lbltColor.Size = New System.Drawing.Size(55, 13)
         Me.lbltColor.TabIndex = 0
@@ -580,13 +583,36 @@ Partial Class frmMain
         Me.csTreeNodesRemove.Size = New System.Drawing.Size(117, 22)
         Me.csTreeNodesRemove.Text = "Remove"
         '
+        'tbMain
+        '
+        Me.tbMain.Controls.Add(Me.TabPage1)
+        Me.tbMain.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.tbMain.ItemSize = New System.Drawing.Size(0, 15)
+        Me.tbMain.Location = New System.Drawing.Point(0, 0)
+        Me.tbMain.Name = "tbMain"
+        Me.tbMain.Padding = New System.Drawing.Point(9, 0)
+        Me.tbMain.SelectedIndex = 0
+        Me.tbMain.Size = New System.Drawing.Size(1138, 728)
+        Me.tbMain.TabIndex = 0
+        '
+        'TabPage1
+        '
+        Me.TabPage1.BackColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.TabPage1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TabPage1.Location = New System.Drawing.Point(4, 19)
+        Me.TabPage1.Name = "TabPage1"
+        Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage1.Size = New System.Drawing.Size(1130, 705)
+        Me.TabPage1.TabIndex = 0
+        Me.TabPage1.Text = "TabPage1"
+        '
         'frmMain
         '
         Me.AllowDrop = True
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.SystemColors.InactiveCaptionText
-        Me.ClientSize = New System.Drawing.Size(1350, 730)
+        Me.ClientSize = New System.Drawing.Size(1384, 730)
         Me.Controls.Add(Me.tsContainer)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
@@ -600,6 +626,7 @@ Partial Class frmMain
         Me.tsContainer.LeftToolStripPanel.PerformLayout()
         Me.tsContainer.ResumeLayout(False)
         Me.tsContainer.PerformLayout()
+        Me.splitMain.Panel1.ResumeLayout(False)
         Me.splitMain.Panel2.ResumeLayout(False)
         Me.splitMain.ResumeLayout(False)
         Me.splitSide.Panel1.ResumeLayout(False)
@@ -609,6 +636,7 @@ Partial Class frmMain
         Me.tsMain.ResumeLayout(False)
         Me.tsMain.PerformLayout()
         Me.csTreeNodes.ResumeLayout(False)
+        Me.tbMain.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -655,5 +683,7 @@ Partial Class frmMain
     Friend WithEvents lblProgram As System.Windows.Forms.Label
     Friend WithEvents csTreeNodes As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents csTreeNodesRemove As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents tbMain As Enid.customTabControl
+    Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
 
 End Class
