@@ -14,9 +14,9 @@ Public Class diaAdd
                 If My.Computer.FileSystem.FileExists(path) Then
                     Dim newButton As New Button
                     newButton = createButton(frmMain.csButtons)
-                    newButton.Tag = path & "|"
+                    newButton.Tag = path & "||True"
                     newButton.Text = label
-                    frmMain.splitMain.Panel1.Controls.Add(newButton)
+                    frmMain.tbMain.SelectedTab.Controls.Add(newButton)
                     Dim panelSize As Size = New Size(frmMain.splitMain.SplitterDistance, frmMain.splitMain.Height)
                     newButton.Location = GetNewLocation(lastPoint, lastSize, newButton.Size, panelSize)
                     lastSize = newButton.Size
@@ -27,6 +27,8 @@ Public Class diaAdd
                 End If
                 pbarImport.Value = IIf(pbarImport.Value + (100 / lvMain.CheckedItems.Count) > 100, 100, pbarImport.Value + (100 / lvMain.CheckedItems.Count))
             Next
+            lastPoint = New Point(-1, -1)
+            lastSize = New Size(-1, -1)
             lvMain.Items.Clear()
             lblCount.Text = ""
             numCols.Value = 10
@@ -39,7 +41,7 @@ Public Class diaAdd
             Me.DialogResult = System.Windows.Forms.DialogResult.OK
             Me.Hide()
 
-            frmMain.splitMain.Panel1.Cursor = Cursors.Cross
+            frmMain.tbMain.SelectedTab.Cursor = Cursors.Cross
 
             dialogList.Location = New Point(frmMain.Location.X + frmMain.Width + 5, frmMain.Location.Y + 5)
             dialogList.Show(frmMain)
@@ -48,7 +50,7 @@ Public Class diaAdd
                 Dim path As String = item.SubItems.Item(1).Text
                 Dim newItem As New ListViewItem(label)
 
-                newItem.Tag = path & "|"
+                newItem.Tag = path & "||True"
                 dialogList.lvChoosen.Items.Add(newItem)
             Next
             dialogList.lvChoosen.Items(0).Selected = True
@@ -58,7 +60,7 @@ Public Class diaAdd
             numRows.Value = 10
             pbarImport.Value = 0
 
-            frmMain.splitMain.Panel1.Focus()
+            frmMain.tbMain.SelectedTab.Focus()
             Me.Close()
         End If
     End Sub

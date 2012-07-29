@@ -7,6 +7,7 @@ Public Class frmMain
 
     Private isFullScreen As Boolean = False
     Private datFile As String = My.Application.Info.DirectoryPath.ToString() & "\data.xml"
+    Private isTabNodeSelected As Boolean = False
 #End Region
 #Region "Button"
     Public Sub Button_MouseDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs)
@@ -28,12 +29,14 @@ Public Class frmMain
                 Process.Start(program, Chr(34) & file & Chr(34))
             End If
         Else
-            For Each item As TreeNode In tvItems.Nodes.Item(0).Nodes
-                If item Is Nothing Then Continue For
-                If activeButton.Text = item.Text Then
-                    tvItems.SelectedNode = item
-                    Exit Sub
-                End If
+            For i = 0 To tvItems.Nodes.Count - 1
+                For Each item As TreeNode In tvItems.Nodes.Item(i).Nodes
+                    If item Is Nothing Then Continue For
+                    If activeButton.Text = item.Text Then
+                        tvItems.SelectedNode = item
+                        Exit Sub
+                    End If
+                Next
             Next
         End If
     End Sub
@@ -66,16 +69,19 @@ Public Class frmMain
     Private Sub tbtnLock_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbtnLock.Click
         If frmMainLocked Then
             tbtnLock.Image = My.Resources.lock_open
+            Me.Text = tbMain.SelectedTab.Text & " - Enid"
             frmMainLocked = False
         Else
             tbtnLock.Image = My.Resources.lock
+            Me.Text = tbMain.SelectedTab.Text & " (Locked) - Enid"
             frmMainLocked = True
         End If
     End Sub
 
     Private Sub tbtnSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbtnSave.Click
         tbMain.SelectedTab.Cursor = Cursors.WaitCursor
-        writeSaveFile(tbMain.SelectedTab, datFile, tvItems.Nodes.Item(0).Text)
+        writeSaveFile(tbMain, datFile)
+        SaveSettings()
         tbMain.SelectedTab.Cursor = Cursors.Default
     End Sub
 #End Region
@@ -90,7 +96,7 @@ Public Class frmMain
         activeButton = strip.SourceControl
 
         activeButton.Visible = False
-        RefreshList()
+        chkVisible.Checked = False
     End Sub
 
     Private Sub csButtonsRename_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles csButtonsRename.Click
@@ -126,7 +132,7 @@ Public Class frmMain
         If MsgBox("Really delete '" & activeButton.Text & "'?", MsgBoxStyle.YesNo + MsgBoxStyle.Information, "Delete?") = MsgBoxResult.Yes Then
             tbMain.SelectedTab.Controls.Remove(activeButton)
         End If
-        RefreshList()
+        CreateList()
         ClearProperties()
     End Sub
 
@@ -136,37 +142,50 @@ Public Class frmMain
 #End Region
 #Region "tvItems"
     Private Function isNodeButton(ByVal node As TreeNode) As Boolean
-        For Each control As Button In tbMain.SelectedTab.Controls
-            If control.Text = node.Text Then Return True
+        If node.Level = 0 Then Return False
+        For Each tp As TabPage In tbMain.TabPages
+            For Each control As Button In tp.Controls
+                If control.Text = node.Text Then Return True
+            Next
         Next
         Return False
     End Function
 
-    Private Sub RefreshList()
+    Private Sub CreateList()
         Dim selected As String = ""
-        If Not tvItems.SelectedNode Is Nothing Then selected = tvItems.SelectedNode.Text
+        If tvItems.SelectedNode IsNot Nothing Then selected = tvItems.SelectedNode.Text
+        tvItems.BeginUpdate()
+        LockWindowUpdate(Me.Handle)
 
-        LockWindowUpdate(tvItems.Handle)
-        tvItems.Nodes(0).Nodes.Clear()
-        For Each control As Button In tbMain.SelectedTab.Controls
-            Dim item As New TreeNode
-            item.Text = control.Text
-            item.BackColor = control.BackColor
-            item.ForeColor = control.ForeColor
-            If control.Visible Then
-                Dim type As String = GetFileType(RemovePath(Split(control.Tag, "|")(0)))
-                item.ImageKey = type
-                item.SelectedImageKey = type
-            Else
-                item.ImageKey = "blank"
-                item.SelectedImageKey = "blank"
-            End If
+        tvItems.Nodes.Clear()
+        For Each tp As TabPage In tbMain.TabPages
+            If tp.Tag = "start" Then Continue For
+            Dim projectNode As New TreeNode(tp.Text)
+            projectNode.ImageKey = "folder"
+            projectNode.SelectedImageKey = "folder"
+            tvItems.Nodes.Add(projectNode)
 
-            tvItems.Nodes.Item(0).Nodes.Add(item)
-            If selected = item.Text Then tvItems.SelectedNode = item
+            For Each control As Button In tp.Controls
+                Dim item As New TreeNode
+                item.Text = control.Text
+                item.BackColor = control.BackColor
+                item.ForeColor = control.ForeColor
+                If CBool(Split(control.Tag, "|")(2)) Then
+                    Dim type As String = GetFileType(RemovePath(Split(control.Tag, "|")(0)))
+                    item.ImageKey = type
+                    item.SelectedImageKey = type
+                Else
+                    item.ImageKey = "blank"
+                    item.SelectedImageKey = "blank"
+                End If
+
+                tvItems.Nodes.Item(tvItems.Nodes.Count - 1).Nodes.Add(item)
+                If item.Text = selected Then tvItems.SelectedNode = item
+            Next
         Next
-        tvItems.Nodes.Item(0).Expand()
+        tvItems.ExpandAll()
         LockWindowUpdate(0)
+        tvItems.EndUpdate()
     End Sub
 
     Private Sub RemoveSelected()
@@ -176,7 +195,7 @@ Public Class frmMain
                 If control.Text = tvItems.SelectedNode.Text Then
                     If MsgBox("Really delete '" & control.Text & "'?", MsgBoxStyle.YesNo + MsgBoxStyle.Information, "Delete?") = MsgBoxResult.Yes Then
                         tbMain.SelectedTab.Controls.Remove(control)
-                        RefreshList()
+                        CreateList()
                         ClearProperties()
                     End If
                 End If
@@ -203,19 +222,39 @@ Public Class frmMain
         End If
     End Sub
 
+    Private Sub tvItems_BeforeSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewCancelEventArgs) Handles tvItems.BeforeSelect
+        LockWindowUpdate(tvItems.Handle)
+    End Sub
+
     Private Sub tvItems_AfterSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles tvItems.AfterSelect
         If isNodeButton(e.Node) Then
+            If e.Node.Parent.Text <> tbMain.SelectedTab.Text Then
+                For Each tp As TabPage In tbMain.TabPages
+                    If e.Node.Parent.Text = tp.Text Then
+                        isTabNodeSelected = True
+                        tbMain.SelectTab(tp)
+                    End If
+                Next
+            End If
+
             For Each control As Button In tbMain.SelectedTab.Controls
                 If control.Text = e.Node.Text Then
                     splitSide.Panel2.Enabled = True
                     SetProperties(control)
-                    Exit Sub
+                    Exit For
                 End If
             Next
         Else
+            For Each tp As TabPage In tbMain.TabPages
+                If e.Node.Text = tp.Text Then
+                    tbMain.SelectTab(tp)
+                    Exit For
+                End If
+            Next
             splitSide.Panel2.Enabled = False
             ClearProperties()
         End If
+        LockWindowUpdate(0)
     End Sub
 
     Private Sub tvItems_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles tvItems.KeyDown
@@ -235,6 +274,51 @@ Public Class frmMain
             End If
         End If
     End Sub
+
+    Private Sub tvItems_MouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles tvItems.MouseDoubleClick
+        If e.Button = Windows.Forms.MouseButtons.Left Then
+            tvItems.SelectedNode = tvItems.GetNodeAt(e.Location)
+            If frmMainLocked AndAlso tvItems.SelectedNode.Level > 0 Then
+                For Each tp As TabPage In tbMain.TabPages
+                    For Each control As Button In tp.Controls
+                        If control.Text = tvItems.SelectedNode.Text Then
+                            Button_MouseDown(control, e)
+                        End If
+                    Next
+                Next
+            End If
+        End If
+    End Sub
+
+    Private Sub tvItems_BeforeCollapse(ByVal sender As System.Object, ByVal e As System.Windows.Forms.TreeViewCancelEventArgs) Handles tvItems.BeforeCollapse
+        e.Cancel = True
+    End Sub
+#End Region
+#Region "tbMain"
+    Private Sub tbMain_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbMain.SelectedIndexChanged
+        If isTabNodeSelected Then
+            isTabNodeSelected = False
+            Exit Sub
+        End If
+
+        If tbMain.SelectedTab.Text = "Start Page" Then
+            splitMain.Panel2Collapsed = True
+            Me.Text = "Enid"
+        Else
+            splitMain.Panel2Collapsed = False
+            For Each node As TreeNode In tvItems.Nodes
+                If node.Text = tbMain.SelectedTab.Text Then
+                    tvItems.SelectedNode = node
+                    Me.Text = tbMain.SelectedTab.Text & IIf(frmMainLocked, " (Locked) - Enid", " - Enid")
+                    Exit For
+                End If
+            Next
+        End If
+    End Sub
+
+    Private Sub tbMain_TabsReordered(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbMain.TabsReordered
+        CreateList()
+    End Sub
 #End Region
 #Region "Form"
     Private Sub toNormal()
@@ -252,10 +336,12 @@ Public Class frmMain
     End Sub
 
     Private Function searchForExisting(ByVal text As String) As Boolean
-        For Each control As Button In tbMain.SelectedTab.Controls
-            If control.Text = text Then
-                Return True
-            End If
+        For Each tp As TabPage In tbMain.TabPages
+            For Each control As Button In tp.Controls
+                If control.Text = text Then
+                    Return True
+                End If
+            Next
         Next
 
         Return False
@@ -276,6 +362,8 @@ Public Class frmMain
                 ElseIf searchForExisting(RemovePath(filePaths(fileNum))) Then
                     MsgBox("Skipping the adding of" & vbCrLf & "'" & filePaths(fileNum) & "'" & vbCrLf & "because it already exists.", MsgBoxStyle.Exclamation)
                 Else
+                    If lastPoint = (New Point(-1, -1)) Then lastPoint = New Point(e.X, e.Y)
+
                     Dim newButton As New Button
                     newButton = createButton(csButtons, filePaths(fileNum))
                     tbMain.SelectedTab.Controls.Add(newButton)
@@ -293,7 +381,7 @@ Public Class frmMain
                         lastPoint = New Point(-1, -1)
                         lastSize = New Size(-1, -1)
                         tbMain.SelectedTab.Controls.Remove(newButton)
-                        RefreshList()
+                        CreateList()
                         Exit Sub
                     Else
                         newButton.Location = newLocation
@@ -304,13 +392,16 @@ Public Class frmMain
                     tmpControl = New MagicControl(newButton)
                 End If
             Next
-            RefreshList()
+
+            lastPoint = New Point(-1, -1)
+            lastSize = New Size(-1, -1)
+            CreateList()
             tvItems.SelectedNode = tvItems.Nodes.Item(0).Nodes.Item(0)
         End If
     End Sub
 
     Private Sub frmMain_DragEnter(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles Me.DragEnter
-        If e.Data.GetDataPresent(DataFormats.FileDrop) And dialogSettings.chkEnAuto.Checked = True Then
+        If e.Data.GetDataPresent(DataFormats.FileDrop) Then
             e.Effect = DragDropEffects.Copy
         Else
             e.Effect = DragDropEffects.None
@@ -319,19 +410,26 @@ Public Class frmMain
 
     Private Sub frmMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         PrepareImageList()
-        tbMain.SelectedTab.BackColor = Color.FromArgb(255, 60, 70, 75)
+        tbMain.SelectedIndex = 1
+        tbMain.TabPages(0).BackColor = Color.FromArgb(255, 60, 70, 75)
 
-        Dim projectNode As New TreeNode("Untitled")
-        projectNode.ImageKey = "folder"
-        projectNode.SelectedImageKey = "folder"
-        tvItems.Nodes.Add(projectNode)
+        LoadSettings()
+        If My.Computer.FileSystem.FileExists(datFile) Then
+            loadSaveFile(tbMain, datFile)
+            tbMain.SelectedIndex = 1
+            Me.Text = tbMain.SelectedTab.Text & " - Enid"
 
-        If Not My.Computer.FileSystem.FileExists(datFile) Then Exit Sub
-        tvItems.Nodes.Item(0).Text = loadSaveFile(tbMain.SelectedTab, datFile)
-        Me.Text = tvItems.Nodes.Item(0).Text & " - Enid"
-        tbMain.SelectedTab.Text = tvItems.Nodes.Item(0).Text
-        ClearProperties()
-        RefreshList()
+            ClearProperties()
+            CreateList()
+        Else
+            tbMain.SelectedTab.Text = "Untitled"
+            Me.Text = tbMain.SelectedTab.Text & " - Enid"
+
+            Dim projectNode As New TreeNode("Untitled")
+            projectNode.ImageKey = "folder"
+            projectNode.SelectedImageKey = "folder"
+            tvItems.Nodes.Add(projectNode)
+        End If
     End Sub
 
     Private Sub frmMain_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
@@ -413,11 +511,11 @@ Public Class frmMain
         txtHeight.Text = control.Height
         txtX.Text = control.Location.X
         txtY.Text = control.Location.Y
-        chkVisible.Checked = control.Visible
 
         Dim buffer() As String = Split(control.Tag, "|")
         txtPath.Text = buffer(0)
         txtProgram.Text = buffer(1)
+        chkVisible.Checked = buffer(2)
     End Sub
 
     Private Sub PaintEllipsis(ByVal sender As System.Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles btnPath.Paint, btnProgram.Paint
@@ -493,7 +591,7 @@ Public Class frmMain
         For Each control As Button In tbMain.SelectedTab.Controls
             If control.Text = tvItems.SelectedNode.Text Then
                 Dim buffer() As String = Split(control.Tag, "|")
-                control.Tag = txtPath.Text & "|" & buffer(1)
+                control.Tag = txtPath.Text & "|" & buffer(1) & "|" & buffer(2)
                 Exit Sub
             End If
         Next
@@ -503,7 +601,7 @@ Public Class frmMain
         For Each control As Button In tbMain.SelectedTab.Controls
             If control.Text = tvItems.SelectedNode.Text Then
                 Dim buffer() As String = Split(control.Tag, "|")
-                control.Tag = buffer(0) & "|" & txtProgram.Text
+                control.Tag = buffer(0) & "|" & txtProgram.Text & "|" & buffer(2)
                 Exit Sub
             End If
         Next
@@ -543,8 +641,10 @@ Public Class frmMain
         If tvItems.SelectedNode Is Nothing Then Exit Sub
         For Each control As Button In tbMain.SelectedTab.Controls
             If control.Text = tvItems.SelectedNode.Text Then
+                Dim buffer() As String = Split(control.Tag, "|")
+                control.Tag = buffer(0) & "|" & buffer(1) & "|" & chkVisible.Checked.ToString
                 control.Visible = chkVisible.Checked
-                RefreshList()
+                CreateList()
                 Exit Sub
             End If
         Next
@@ -557,7 +657,8 @@ Public Class frmMain
 
     Private Sub PathProg_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtPath.TextChanged, txtProgram.TextChanged
         Dim control As Control = sender
-        control.Tag = txtPath.Text & "|" & txtProgram.Text
+        If control.Tag Is Nothing Then control.Tag = txtPath.Text & "|" & txtProgram.Text & "|True" : Exit Sub
+        control.Tag = txtPath.Text & "|" & txtProgram.Text & "|" & Split(control.Tag, "|")(2)
     End Sub
 #End Region
 End Class

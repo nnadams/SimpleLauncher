@@ -2,44 +2,51 @@
 Imports System.Xml
 
 Module XMLFiles
-    Public Function loadSaveFile(ByRef window As Control, ByVal file As String) As String
+    Public Sub loadSaveFile(ByRef tabControl As customTabControl, ByVal file As String)
         On Error Resume Next
 
-        Dim projectName As String = "Untitled"
         Dim xmlFile As New XmlDocument
         xmlFile.Load(file)
-        Dim mainNode As XmlNodeList = xmlFile.SelectNodes("Project")
+        Dim mainNode As XmlNodeList = xmlFile.SelectNodes("Enid")
 
-        If Not handleVersion(mainNode) Then Return projectName
+        If Not handleVersion(mainNode) Then Exit Sub
 
-        projectName = mainNode.Item(0).Attributes(0).InnerText
-        loadSettings(mainNode)
+        For i As Short = 0 To mainNode.Item(0).ChildNodes.Count - 1
+            'If i = 1 Then
+            '    tabControl.SelectedIndex = 1
+            '    tabControl.SelectedTab.Text = mainNode.Item(0).ChildNodes(i).Attributes(0).InnerText
+            'Else
+            Dim newTabPage As New TabPage(mainNode.Item(0).ChildNodes(i).Attributes(0).InnerText)
+            newTabPage.BackColor = Color.FromArgb(255, 60, 70, 75)
+            newTabPage.BorderStyle = BorderStyle.None
+            tabControl.TabPages.Add(newTabPage)
+            tabControl.SelectedIndex = tabControl.TabPages.Count - 1
+            'End If
 
-        For i As Short = 1 To mainNode.Item(0).ChildNodes.Count - 1
-            Dim newButton As New Button
-            newButton = createButton(frmMain.csButtons)
-            newButton.Text = mainNode.Item(0).ChildNodes.Item(i).ChildNodes.Item(0).InnerText
-            newButton.Tag = mainNode.Item(0).ChildNodes.Item(i).ChildNodes.Item(1).InnerText & "|"
-            newButton.ForeColor = HexToColor(mainNode.Item(0).ChildNodes.Item(i).ChildNodes.Item(2).InnerText)
-            newButton.BackColor = HexToColor(mainNode.Item(0).ChildNodes.Item(i).ChildNodes.Item(3).InnerText)
-            window.Controls.Add(newButton)
-            newButton.Location = New Point(mainNode.Item(0).ChildNodes.Item(i).ChildNodes.Item(4).InnerText, mainNode.Item(0).ChildNodes.Item(i).ChildNodes.Item(5).InnerText)
-            newButton.Size = New Size(mainNode.Item(0).ChildNodes.Item(i).ChildNodes.Item(6).InnerText, mainNode.Item(0).ChildNodes.Item(i).ChildNodes.Item(7).InnerText)
-            newButton.Visible = CBool(mainNode.Item(0).ChildNodes.Item(i).ChildNodes.Item(8).InnerText)
+            For j As Short = 0 To mainNode.Item(0).ChildNodes(i).ChildNodes.Count - 1
+                Dim newButton As New Button
+                With mainNode.Item(0).ChildNodes.Item(i).ChildNodes.Item(j).ChildNodes
+                    newButton = createButton(frmMain.csButtons)
+                    newButton.Text = .Item(0).InnerText
+                    newButton.Tag = .Item(1).InnerText & "|"
+                    newButton.ForeColor = HexToColor(.Item(2).InnerText)
+                    newButton.BackColor = HexToColor(.Item(3).InnerText)
+                    tabControl.SelectedTab.Controls.Add(newButton)
 
-            If mainNode.Item(0).ChildNodes.Item(i).ChildNodes.Item(9).InnerText = "" Then
+                    newButton.Location = New Point(.Item(4).InnerText, .Item(5).InnerText)
+                    newButton.Size = New Size(.Item(6).InnerText, .Item(7).InnerText)
 
-            Else
-                newButton.Tag += mainNode.Item(0).ChildNodes.Item(i).ChildNodes.Item(9).InnerText
-            End If
+                    newButton.Tag += .Item(9).InnerText & "|"
+                    newButton.Tag += .Item(8).InnerText
 
-            frmMain.tmpControl = New MagicControl(newButton)
+                    frmMain.tmpControl = New MagicControl(newButton)
+                End With
+            Next
         Next
-        Return projectName
-    End Function
+    End Sub
 
     Private Function handleVersion(ByVal mainNode As XmlNodeList) As Boolean
-        Dim filesVersion As String = mainNode.Item(0).Attributes(1).InnerText
+        Dim filesVersion As String = mainNode.Item(0).Attributes(0).InnerText
         Dim currentVersion As String = My.Application.Info.Version.Major & "." & My.Application.Info.Version.Minor
 
         If filesVersion <> currentVersion Then
@@ -51,23 +58,7 @@ Module XMLFiles
         Return True
     End Function
 
-    Private Sub loadSettings(ByVal mainNode As XmlNodeList)
-        On Error Resume Next
-
-        Dim settingsNode As XmlNode = mainNode.Item(0).ChildNodes.Item(0)
-        dialogSettings.chkEnAuto.Checked = CBool(settingsNode.ChildNodes.Item(0).InnerText)
-        dialogSettings.numCols.Value = CDec(settingsNode.ChildNodes.Item(1).InnerText)
-        dialogSettings.numRows.Value = CDec(settingsNode.ChildNodes.Item(2).InnerText)
-        dialogSettings.openDialog.FileName = settingsNode.ChildNodes.Item(3).InnerText
-        frmMain.Width = CInt(settingsNode.ChildNodes.Item(4).InnerText)
-        frmMain.Height = CInt(settingsNode.ChildNodes.Item(5).InnerText)
-        lastPoint.X = CInt(settingsNode.ChildNodes.Item(6).InnerText)
-        lastPoint.Y = CInt(settingsNode.ChildNodes.Item(7).InnerText)
-        lastSize.Width = CInt(settingsNode.ChildNodes.Item(8).InnerText)
-        lastSize.Height = CInt(settingsNode.ChildNodes.Item(9).InnerText)
-    End Sub
-
-    Public Function writeSaveFile(ByRef window As Control, ByVal file As String, Optional ByVal name As String = "Untitled") As Boolean
+    Public Function writeSaveFile(ByRef tabControl As customTabControl, ByVal file As String) As Boolean
         Try
             Dim xmlWriter As New XmlTextWriter(file, Encoding.UTF8)
             xmlWriter.Formatting = Formatting.Indented
@@ -75,13 +66,20 @@ Module XMLFiles
             xmlWriter.Indentation = 1
 
             xmlWriter.WriteStartDocument(True)
-            xmlWriter.WriteStartElement("Project")
-            writeProjectAttributes(xmlWriter, name)
+            xmlWriter.WriteStartElement("Enid")
+            writeVersion(xmlWriter)
 
-            writeSettings(xmlWriter)
+            For Each tp As TabPage In tabControl.TabPages
+                If tp.Text = "Start Page" Then Continue For
+                xmlWriter.WriteStartElement("Project")
+                xmlWriter.WriteStartAttribute("name")
+                xmlWriter.WriteString(tp.Text)
+                xmlWriter.WriteEndAttribute()
 
-            For Each btn As Button In window.Controls
-                writeButtonNode(xmlWriter, btn)
+                For Each btn As Button In tp.Controls
+                    writeButtonNode(xmlWriter, btn)
+                Next
+                xmlWriter.WriteEndElement()
             Next
 
             xmlWriter.WriteEndElement()
@@ -92,43 +90,6 @@ Module XMLFiles
             Return False
         End Try
     End Function
-
-    Private Sub writeSettings(ByVal xmlWriter As XmlTextWriter)
-        xmlWriter.WriteStartElement("Settings")
-
-        xmlWriter.WriteStartElement("canAutoImport")
-        xmlWriter.WriteString(dialogSettings.chkEnAuto.Checked.ToString)
-        xmlWriter.WriteEndElement()
-        xmlWriter.WriteStartElement("AutoImportColumns")
-        xmlWriter.WriteString(dialogSettings.numCols.Value)
-        xmlWriter.WriteEndElement()
-        xmlWriter.WriteStartElement("AutoImportRows")
-        xmlWriter.WriteString(dialogSettings.numRows.Value)
-        xmlWriter.WriteEndElement()
-        xmlWriter.WriteStartElement("DefaultProgram")
-        xmlWriter.WriteString(dialogSettings.openDialog.FileName)
-        xmlWriter.WriteEndElement()
-        xmlWriter.WriteStartElement("WindowWidth")
-        xmlWriter.WriteString(frmMain.Width)
-        xmlWriter.WriteEndElement()
-        xmlWriter.WriteStartElement("WindowHeight")
-        xmlWriter.WriteString(frmMain.Height)
-        xmlWriter.WriteEndElement()
-        xmlWriter.WriteStartElement("lastX")
-        xmlWriter.WriteString(lastPoint.X)
-        xmlWriter.WriteEndElement()
-        xmlWriter.WriteStartElement("lastY")
-        xmlWriter.WriteString(lastPoint.Y)
-        xmlWriter.WriteEndElement()
-        xmlWriter.WriteStartElement("lastWidth")
-        xmlWriter.WriteString(lastSize.Width)
-        xmlWriter.WriteEndElement()
-        xmlWriter.WriteStartElement("lastHeight")
-        xmlWriter.WriteString(lastSize.Height)
-        xmlWriter.WriteEndElement()
-
-        xmlWriter.WriteEndElement()
-    End Sub
 
     Private Sub writeButtonNode(ByVal xmlWriter As XmlTextWriter, ByVal button As Button)
         xmlWriter.WriteStartElement("Button")
@@ -158,7 +119,7 @@ Module XMLFiles
         xmlWriter.WriteString(button.Size.Height)
         xmlWriter.WriteEndElement()
         xmlWriter.WriteStartElement("Visible")
-        xmlWriter.WriteString(button.Visible.ToString)
+        xmlWriter.WriteString(Split(button.Tag, "|")(2))
         xmlWriter.WriteEndElement()
         xmlWriter.WriteStartElement("Program")
         xmlWriter.WriteString(Split(button.Tag, "|")(1))
@@ -167,11 +128,7 @@ Module XMLFiles
         xmlWriter.WriteEndElement()
     End Sub
 
-    Private Sub writeProjectAttributes(ByVal xmlWriter As XmlTextWriter, ByVal name As String)
-        xmlWriter.WriteStartAttribute("name")
-        xmlWriter.WriteString(name)
-        xmlWriter.WriteEndAttribute()
-
+    Private Sub writeVersion(ByVal xmlWriter As XmlTextWriter)
         xmlWriter.WriteStartAttribute("version")
         xmlWriter.WriteString(My.Application.Info.Version.Major & "." & My.Application.Info.Version.Minor)
         xmlWriter.WriteEndAttribute()

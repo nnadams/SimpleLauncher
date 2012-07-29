@@ -34,6 +34,8 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <ApplicationIcon>blue_pill.ico</ApplicationIcon>
+    <SignManifests>true</SignManifests>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -231,6 +233,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="blue_pill.ico" />
+    <None Include="app.config" />
     <None Include="Resources\photo.ico" />
     <None Include="Resources\music.ico" />
     <None Include="Resources\folder_table.ico" />

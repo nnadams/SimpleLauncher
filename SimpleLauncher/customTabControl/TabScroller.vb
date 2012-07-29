@@ -60,6 +60,7 @@
         Me.Name = "TabScroller"
         Me.Size = New System.Drawing.Size(80, 40)
         Me.BackColor = SystemColors.InactiveCaptionText
+        Me.TabStop = False
         Me.ResumeLayout(False)
     End Sub
 #End Region

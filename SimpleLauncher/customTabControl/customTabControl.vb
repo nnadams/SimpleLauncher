@@ -5,6 +5,8 @@ Imports System.Security.Permissions
 Public Class customTabControl
     Inherits TabControl
 #Region "Declarations"
+    Public Event TabsReordered As EventHandler
+
     Private WithEvents nativeScroller As NativeScroller
     Private WithEvents newScroller As New TabScroller
 
@@ -13,6 +15,8 @@ Public Class customTabControl
     Private Const WM_HSCROLL As Int32 = &H114
     Private Const WM_Create As Int32 = &H1
     Private Const WM_PARENTNOTIFY As Int32 = &H210
+
+    Private movingTab As TabPage = Nothing
 
     <DllImport("user32.dll")> Private Shared Function SendMessage(ByVal hWnd As IntPtr, ByVal Msg As Integer, ByVal wParam As IntPtr, ByVal lParam As IntPtr) As IntPtr
     End Function
@@ -24,6 +28,17 @@ Public Class customTabControl
     End Function
 
     <DllImport("user32.dll")> Private Shared Function LockWindowUpdate(ByVal hWndLock As IntPtr) As Boolean
+    End Function
+
+    Private Function PointToTab(ByVal x As Integer, ByVal y As Integer) As TabPage
+        For i As Integer = 0 To MyBase.TabPages.Count - 1
+            Dim tmpRect As Rectangle = MyBase.GetTabRect(i)
+            tmpRect.Inflate(-2, 0)
+            If tmpRect.Contains(x, y) Then
+                Return MyBase.TabPages(i)
+            End If
+        Next
+        Return Nothing
     End Function
 #End Region
 #Region "Paint"
@@ -61,6 +76,7 @@ Public Class customTabControl
     End Sub
 
     Private Sub paintTab(ByVal e As System.Windows.Forms.PaintEventArgs, ByVal index As Integer)
+        If index >= Me.TabPages.Count Then Exit Sub
         Dim path As System.Drawing.Drawing2D.GraphicsPath = Me.GetPath(index)
         paintTabBackground(e.Graphics, index, path)
         paintTabBorder(e.Graphics, index, path)
@@ -114,6 +130,51 @@ Public Class customTabControl
     End Sub
 #End Region
 #Region "Events"
+    Protected Overrides Sub OnMouseDown(ByVal e As System.Windows.Forms.MouseEventArgs)
+        If (e.Button = Windows.Forms.MouseButtons.Left) AndAlso _
+        (Me.SelectedTab IsNot Nothing) AndAlso (Not Me.GetTabRect(Me.SelectedIndex).IsEmpty) Then
+            movingTab = Me.SelectedTab
+        End If
+
+        MyBase.OnMouseDown(e)
+    End Sub
+
+    Protected Overrides Sub OnMouseMove(ByVal e As MouseEventArgs)
+        If (e.Button = Windows.Forms.MouseButtons.Left) AndAlso (movingTab IsNot Nothing) Then
+            Dim mouseTab As System.Windows.Forms.TabPage = PointToTab(e.X, e.Y)
+            If (mouseTab IsNot Nothing) AndAlso (mouseTab IsNot movingTab) Then
+                If Me.TabPages.IndexOf(mouseTab) < Me.TabPages.IndexOf(movingTab) Then
+                    LockWindowUpdate(Me.FindForm().Handle)
+                    Me.TabPages.Remove(movingTab)
+                    Me.TabPages.Insert(Me.TabPages.IndexOf(mouseTab), movingTab)
+                    Me.SelectedTab = movingTab
+                    LockWindowUpdate(0)
+
+                    RaiseEvent TabsReordered(Me, EventArgs.Empty)
+                ElseIf (Me.TabPages.IndexOf(mouseTab) > Me.TabPages.IndexOf(movingTab)) Then
+                    LockWindowUpdate(Me.FindForm().Handle)
+                    Me.TabPages.Remove(movingTab)
+                    Me.TabPages.Insert(Me.TabPages.IndexOf(mouseTab) + 1, movingTab)
+                    Me.SelectedTab = movingTab
+                    LockWindowUpdate(0)
+
+                    RaiseEvent TabsReordered(Me, EventArgs.Empty)
+                Else
+                    Me.Cursor = Cursors.Default
+                End If
+            End If
+        Else
+            Me.Cursor = Cursors.Default
+        End If
+        MyBase.OnMouseMove(e)
+    End Sub
+
+    Protected Overrides Sub OnMouseUp(ByVal e As MouseEventArgs)
+        movingTab = Nothing
+
+        MyBase.OnMouseUp(e)
+    End Sub
+
     Protected Overrides Sub OnPaint(ByVal e As System.Windows.Forms.PaintEventArgs)
         If Me.TabCount > 0 Then
             For index As Integer = 0 To Me.TabCount - 1

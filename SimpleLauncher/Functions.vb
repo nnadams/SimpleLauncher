@@ -1,4 +1,5 @@
 ﻿Imports System.Text.RegularExpressions
+Imports System.Runtime.InteropServices
 
 Module Functions
     Public dialogSettings As New diaSettings
@@ -17,6 +18,20 @@ Module Functions
     Public audioExtensions() As String = {"3ga", "flac", "m3u", "m4a", "mid", "midi", "mka", "mp2", "mp3", "mpa", "oga", "ogg", "pls", "ra", "wav", "wma"}
     Public imageExtensions() As String = {"bmp", "dds", "dib", "gif", "jpeg", "jpg", "png", "psd", "ps", "svg", "tga", "tiff", "tif", "xcf"}
     Public progrExtensions() As String = {"com", "exe", "jar", "vbs", "wsf"}
+
+    <DllImport("user32.dll")> Public Function LockWindowUpdate(ByVal hWndLock As IntPtr) As Boolean
+    End Function
+
+    Public Sub SaveSettings()
+        My.Settings.formSize = frmMain.Size
+        My.Settings.defaultProgram = dialogSettings.openDialog.FileName
+        My.Settings.Save()
+    End Sub
+
+    Public Sub LoadSettings()
+        frmMain.Size = My.Settings.formSize
+        dialogSettings.openDialog.FileName = My.Settings.defaultProgram
+    End Sub
 
     Public Function GetFileType(ByVal name As String) As String
         Dim theExtension As String = Mid(name, InStrRev(name, ".") + 1)
@@ -41,6 +56,7 @@ Module Functions
 
         If nextRightEdge <= clientSize.Width Then
             If lastLoc = (New Point(-1, -1)) Then Return New Point(xStartDist, yStartDist)
+            If lastSize = (New Size(-1, -1)) Then Return New Point(lastLoc.X - (newSize.Width / 1.5), lastLoc.Y - (newSize.Height * 2))
             Return New Point(lastLoc.X + lastSize.Width + buttonPadding, lastLoc.Y)
         Else
             If nextLowerEdge <= clientSize.Height And (xStartDist + newSize.Width) <= clientSize.Width Then
@@ -57,10 +73,11 @@ Module Functions
         newButton.MinimumSize = New Size(23, 23)
         newButton.Text = RemovePath(path)
         newButton.ContextMenuStrip = contextmenu
-        newButton.Tag = path & "|" & IIf(GetFileType(RemovePath(path)) = "terminal", "", dialogSettings.openDialog.FileName)
+        newButton.Tag = path & "|" & IIf(GetFileType(RemovePath(path)) = "terminal", "", dialogSettings.openDialog.FileName) & "|True"
         newButton.FlatStyle = FlatStyle.Popup
         newButton.BackColor = Color.FromArgb(120, 120, 190)
         newButton.ForeColor = Color.White
+        newButton.Visible = True
 
         AddHandler newButton.MouseDown, AddressOf frmMain.Button_MouseDown
         AddHandler newButton.Resize, AddressOf frmMain.Button_Reize
