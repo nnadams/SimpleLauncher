@@ -30,6 +30,12 @@ Partial Class frmMain
         Me.csButtonsRemove = New System.Windows.Forms.ToolStripMenuItem
         Me.tsContainer = New System.Windows.Forms.ToolStripContainer
         Me.splitMain = New System.Windows.Forms.SplitContainer
+        Me.imglstProject = New System.Windows.Forms.ImageList(Me.components)
+        Me.imglstPlugins = New System.Windows.Forms.ImageList(Me.components)
+        Me.rectPlugins = New Microsoft.VisualBasic.PowerPacks.RectangleShape
+        Me.rectHelp = New Microsoft.VisualBasic.PowerPacks.RectangleShape
+        Me.rectcurProjects = New Microsoft.VisualBasic.PowerPacks.RectangleShape
+        Me.rectProjects = New Microsoft.VisualBasic.PowerPacks.RectangleShape
         Me.splitSide = New System.Windows.Forms.SplitContainer
         Me.tvItems = New System.Windows.Forms.TreeView
         Me.imglstTree = New System.Windows.Forms.ImageList(Me.components)
@@ -67,8 +73,20 @@ Partial Class frmMain
         Me.ttColorMsg = New System.Windows.Forms.ToolTip(Me.components)
         Me.csTreeNodes = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.csTreeNodesRemove = New System.Windows.Forms.ToolStripMenuItem
+        Me.csRecent = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.ClearToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.tbMain = New Enid.customTabControl
-        Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.tpStart = New System.Windows.Forms.TabPage
+        Me.lnkLocatePlugins = New System.Windows.Forms.LinkLabel
+        Me.lvProjects = New System.Windows.Forms.ListView
+        Me.lvPlugins = New System.Windows.Forms.ListView
+        Me.Label4 = New System.Windows.Forms.Label
+        Me.lblcurProject = New System.Windows.Forms.Label
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.lnkOpenProject = New System.Windows.Forms.LinkLabel
+        Me.lnkNewProject = New System.Windows.Forms.LinkLabel
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.ShapeContainer1 = New Microsoft.VisualBasic.PowerPacks.ShapeContainer
         Me.csButtons.SuspendLayout()
         Me.tsContainer.ContentPanel.SuspendLayout()
         Me.tsContainer.LeftToolStripPanel.SuspendLayout()
@@ -81,7 +99,9 @@ Partial Class frmMain
         Me.splitSide.SuspendLayout()
         Me.tsMain.SuspendLayout()
         Me.csTreeNodes.SuspendLayout()
+        Me.csRecent.SuspendLayout()
         Me.tbMain.SuspendLayout()
+        Me.tpStart.SuspendLayout()
         Me.SuspendLayout()
         '
         'csButtons
@@ -124,7 +144,7 @@ Partial Class frmMain
         '
         Me.tsContainer.ContentPanel.Controls.Add(Me.splitMain)
         Me.tsContainer.ContentPanel.Margin = New System.Windows.Forms.Padding(2)
-        Me.tsContainer.ContentPanel.Size = New System.Drawing.Size(1360, 730)
+        Me.tsContainer.ContentPanel.Size = New System.Drawing.Size(1360, 736)
         '
         'tsContainer.LeftToolStripPanel
         '
@@ -139,7 +159,7 @@ Partial Class frmMain
         '
         Me.tsContainer.RightToolStripPanel.BackgroundImage = Global.Enid.My.Resources.Resources.background
         Me.tsContainer.RightToolStripPanelVisible = False
-        Me.tsContainer.Size = New System.Drawing.Size(1384, 730)
+        Me.tsContainer.Size = New System.Drawing.Size(1384, 736)
         Me.tsContainer.TabIndex = 2
         Me.tsContainer.TopToolStripPanelVisible = False
         '
@@ -157,18 +177,86 @@ Partial Class frmMain
         'splitMain.Panel1
         '
         Me.splitMain.Panel1.Controls.Add(Me.tbMain)
+        Me.splitMain.Panel1MinSize = 800
         '
         'splitMain.Panel2
         '
         Me.splitMain.Panel2.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.splitMain.Panel2.Controls.Add(Me.splitSide)
-        Me.splitMain.Panel2MinSize = 145
-        Me.splitMain.Size = New System.Drawing.Size(1358, 728)
-        Me.splitMain.SplitterDistance = 1148
+        Me.splitMain.Panel2MinSize = 140
+        Me.splitMain.Size = New System.Drawing.Size(1358, 734)
+        Me.splitMain.SplitterDistance = 1109
         Me.splitMain.SplitterIncrement = 10
         Me.splitMain.SplitterWidth = 3
         Me.splitMain.TabIndex = 0
         Me.splitMain.TabStop = False
+        '
+        'imglstProject
+        '
+        Me.imglstProject.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit
+        Me.imglstProject.ImageSize = New System.Drawing.Size(16, 16)
+        Me.imglstProject.TransparentColor = System.Drawing.Color.Transparent
+        '
+        'imglstPlugins
+        '
+        Me.imglstPlugins.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit
+        Me.imglstPlugins.ImageSize = New System.Drawing.Size(16, 16)
+        Me.imglstPlugins.TransparentColor = System.Drawing.Color.Transparent
+        '
+        'rectPlugins
+        '
+        Me.rectPlugins.AccessibleRole = System.Windows.Forms.AccessibleRole.Grouping
+        Me.rectPlugins.BorderColor = System.Drawing.SystemColors.ControlDarkDark
+        Me.rectPlugins.BorderWidth = 3
+        Me.rectPlugins.CornerRadius = 25
+        Me.rectPlugins.FillColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.rectPlugins.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid
+        Me.rectPlugins.Location = New System.Drawing.Point(3, 203)
+        Me.rectPlugins.Name = "rectPlugins"
+        Me.rectPlugins.SelectionColor = System.Drawing.Color.Transparent
+        Me.rectPlugins.Size = New System.Drawing.Size(254, 279)
+        '
+        'rectHelp
+        '
+        Me.rectHelp.AccessibleRole = System.Windows.Forms.AccessibleRole.Grouping
+        Me.rectHelp.BorderColor = System.Drawing.SystemColors.ControlDarkDark
+        Me.rectHelp.BorderWidth = 3
+        Me.rectHelp.CornerRadius = 25
+        Me.rectHelp.FillColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.rectHelp.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid
+        Me.rectHelp.Location = New System.Drawing.Point(3, 492)
+        Me.rectHelp.Name = "rectHelp"
+        Me.rectHelp.SelectionColor = System.Drawing.Color.Transparent
+        Me.rectHelp.Size = New System.Drawing.Size(254, 200)
+        '
+        'rectcurProjects
+        '
+        Me.rectcurProjects.AccessibleRole = System.Windows.Forms.AccessibleRole.Grouping
+        Me.rectcurProjects.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.rectcurProjects.BorderColor = System.Drawing.SystemColors.ControlDarkDark
+        Me.rectcurProjects.BorderWidth = 3
+        Me.rectcurProjects.CornerRadius = 25
+        Me.rectcurProjects.FillColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.rectcurProjects.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid
+        Me.rectcurProjects.Location = New System.Drawing.Point(266, 3)
+        Me.rectcurProjects.Name = "rectcurProjects"
+        Me.rectcurProjects.SelectionColor = System.Drawing.Color.Transparent
+        Me.rectcurProjects.Size = New System.Drawing.Size(820, 695)
+        '
+        'rectProjects
+        '
+        Me.rectProjects.AccessibleRole = System.Windows.Forms.AccessibleRole.Grouping
+        Me.rectProjects.BorderColor = System.Drawing.SystemColors.ControlDarkDark
+        Me.rectProjects.BorderWidth = 3
+        Me.rectProjects.CornerRadius = 25
+        Me.rectProjects.FillColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.rectProjects.FillStyle = Microsoft.VisualBasic.PowerPacks.FillStyle.Solid
+        Me.rectProjects.Location = New System.Drawing.Point(3, 3)
+        Me.rectProjects.Name = "RectangleShape1"
+        Me.rectProjects.SelectionColor = System.Drawing.Color.Transparent
+        Me.rectProjects.Size = New System.Drawing.Size(254, 189)
         '
         'splitSide
         '
@@ -209,9 +297,8 @@ Partial Class frmMain
         Me.splitSide.Panel2.Controls.Add(Me.lbltColor)
         Me.splitSide.Panel2.Controls.Add(Me.lblPath)
         Me.splitSide.Panel2.Controls.Add(Me.lblText)
-        Me.splitSide.Panel2.Enabled = False
-        Me.splitSide.Size = New System.Drawing.Size(207, 728)
-        Me.splitSide.SplitterDistance = 564
+        Me.splitSide.Size = New System.Drawing.Size(246, 734)
+        Me.splitSide.SplitterDistance = 529
         Me.splitSide.SplitterIncrement = 17
         Me.splitSide.SplitterWidth = 3
         Me.splitSide.TabIndex = 0
@@ -221,6 +308,7 @@ Partial Class frmMain
         Me.tvItems.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.tvItems.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.tvItems.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.tvItems.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.tvItems.ForeColor = System.Drawing.Color.White
         Me.tvItems.HideSelection = False
         Me.tvItems.ImageIndex = 0
@@ -230,8 +318,9 @@ Partial Class frmMain
         Me.tvItems.Name = "tvItems"
         Me.tvItems.SelectedImageIndex = 0
         Me.tvItems.ShowRootLines = False
-        Me.tvItems.Size = New System.Drawing.Size(205, 562)
+        Me.tvItems.Size = New System.Drawing.Size(244, 527)
         Me.tvItems.TabIndex = 0
+        Me.tvItems.TabStop = False
         '
         'imglstTree
         '
@@ -243,17 +332,18 @@ Partial Class frmMain
         '
         Me.chkVisible.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.chkVisible.AutoSize = True
+        Me.chkVisible.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.chkVisible.Checked = True
         Me.chkVisible.CheckState = System.Windows.Forms.CheckState.Checked
         Me.chkVisible.FlatAppearance.BorderColor = System.Drawing.SystemColors.ControlDarkDark
         Me.chkVisible.FlatAppearance.CheckedBackColor = System.Drawing.SystemColors.ActiveCaption
         Me.chkVisible.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.chkVisible.ForeColor = System.Drawing.Color.Black
-        Me.chkVisible.Location = New System.Drawing.Point(172, 119)
+        Me.chkVisible.Location = New System.Drawing.Point(218, 139)
         Me.chkVisible.Name = "chkVisible"
         Me.chkVisible.Size = New System.Drawing.Size(12, 11)
-        Me.chkVisible.TabIndex = 3
-        Me.chkVisible.UseVisualStyleBackColor = True
+        Me.chkVisible.TabIndex = 6
+        Me.chkVisible.UseVisualStyleBackColor = False
         '
         'btnProgram
         '
@@ -262,10 +352,10 @@ Partial Class frmMain
         Me.btnProgram.FlatAppearance.BorderColor = System.Drawing.SystemColors.ControlDarkDark
         Me.btnProgram.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnProgram.ForeColor = System.Drawing.Color.White
-        Me.btnProgram.Location = New System.Drawing.Point(176, 139)
+        Me.btnProgram.Location = New System.Drawing.Point(219, 164)
         Me.btnProgram.Name = "btnProgram"
-        Me.btnProgram.Size = New System.Drawing.Size(21, 20)
-        Me.btnProgram.TabIndex = 2
+        Me.btnProgram.Size = New System.Drawing.Size(21, 22)
+        Me.btnProgram.TabIndex = 9
         Me.btnProgram.TextAlign = System.Drawing.ContentAlignment.TopLeft
         Me.btnProgram.UseVisualStyleBackColor = False
         '
@@ -276,9 +366,9 @@ Partial Class frmMain
         Me.btnPath.FlatAppearance.BorderColor = System.Drawing.SystemColors.ControlDarkDark
         Me.btnPath.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnPath.ForeColor = System.Drawing.Color.White
-        Me.btnPath.Location = New System.Drawing.Point(176, 36)
+        Me.btnPath.Location = New System.Drawing.Point(219, 43)
         Me.btnPath.Name = "btnPath"
-        Me.btnPath.Size = New System.Drawing.Size(21, 20)
+        Me.btnPath.Size = New System.Drawing.Size(21, 22)
         Me.btnPath.TabIndex = 2
         Me.btnPath.TextAlign = System.Drawing.ContentAlignment.TopLeft
         Me.btnPath.UseVisualStyleBackColor = False
@@ -288,12 +378,14 @@ Partial Class frmMain
         Me.txtHeight.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.txtHeight.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.txtHeight.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.txtHeight.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtHeight.ForeColor = System.Drawing.Color.White
-        Me.txtHeight.Location = New System.Drawing.Point(151, 88)
+        Me.txtHeight.Location = New System.Drawing.Point(195, 104)
         Me.txtHeight.MaxLength = 4
         Me.txtHeight.Name = "txtHeight"
-        Me.txtHeight.Size = New System.Drawing.Size(30, 20)
-        Me.txtHeight.TabIndex = 1
+        Me.txtHeight.Size = New System.Drawing.Size(30, 22)
+        Me.txtHeight.TabIndex = 5
+        Me.txtHeight.TabStop = False
         Me.txtHeight.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'txtY
@@ -301,12 +393,14 @@ Partial Class frmMain
         Me.txtY.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.txtY.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.txtY.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.txtY.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtY.ForeColor = System.Drawing.Color.White
-        Me.txtY.Location = New System.Drawing.Point(97, 114)
+        Me.txtY.Location = New System.Drawing.Point(108, 134)
         Me.txtY.MaxLength = 4
         Me.txtY.Name = "txtY"
-        Me.txtY.Size = New System.Drawing.Size(30, 20)
-        Me.txtY.TabIndex = 1
+        Me.txtY.Size = New System.Drawing.Size(41, 22)
+        Me.txtY.TabIndex = 7
+        Me.txtY.TabStop = False
         Me.txtY.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'txtWidth
@@ -314,12 +408,14 @@ Partial Class frmMain
         Me.txtWidth.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.txtWidth.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.txtWidth.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.txtWidth.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtWidth.ForeColor = System.Drawing.Color.White
-        Me.txtWidth.Location = New System.Drawing.Point(65, 88)
+        Me.txtWidth.Location = New System.Drawing.Point(103, 104)
         Me.txtWidth.MaxLength = 4
         Me.txtWidth.Name = "txtWidth"
-        Me.txtWidth.Size = New System.Drawing.Size(30, 20)
-        Me.txtWidth.TabIndex = 1
+        Me.txtWidth.Size = New System.Drawing.Size(30, 22)
+        Me.txtWidth.TabIndex = 4
+        Me.txtWidth.TabStop = False
         Me.txtWidth.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'txtX
@@ -327,12 +423,14 @@ Partial Class frmMain
         Me.txtX.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.txtX.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.txtX.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.txtX.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtX.ForeColor = System.Drawing.Color.White
-        Me.txtX.Location = New System.Drawing.Point(41, 114)
+        Me.txtX.Location = New System.Drawing.Point(38, 134)
         Me.txtX.MaxLength = 4
         Me.txtX.Name = "txtX"
-        Me.txtX.Size = New System.Drawing.Size(30, 20)
+        Me.txtX.Size = New System.Drawing.Size(41, 22)
         Me.txtX.TabIndex = 1
+        Me.txtX.TabStop = False
         Me.txtX.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'txtProgram
@@ -341,11 +439,13 @@ Partial Class frmMain
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtProgram.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.txtProgram.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.txtProgram.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtProgram.ForeColor = System.Drawing.Color.White
-        Me.txtProgram.Location = New System.Drawing.Point(55, 139)
+        Me.txtProgram.Location = New System.Drawing.Point(67, 164)
         Me.txtProgram.Name = "txtProgram"
-        Me.txtProgram.Size = New System.Drawing.Size(122, 20)
-        Me.txtProgram.TabIndex = 1
+        Me.txtProgram.Size = New System.Drawing.Size(150, 22)
+        Me.txtProgram.TabIndex = 8
+        Me.txtProgram.TabStop = False
         '
         'txtPath
         '
@@ -353,37 +453,41 @@ Partial Class frmMain
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtPath.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.txtPath.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.txtPath.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtPath.ForeColor = System.Drawing.Color.White
-        Me.txtPath.Location = New System.Drawing.Point(35, 36)
+        Me.txtPath.Location = New System.Drawing.Point(41, 43)
         Me.txtPath.Name = "txtPath"
-        Me.txtPath.Size = New System.Drawing.Size(142, 20)
+        Me.txtPath.Size = New System.Drawing.Size(176, 22)
         Me.txtPath.TabIndex = 1
+        Me.txtPath.TabStop = False
         '
         'txtColor
         '
         Me.txtColor.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.txtColor.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.txtColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txtColor.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txtColor.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtColor.ForeColor = System.Drawing.Color.White
-        Me.txtColor.Location = New System.Drawing.Point(149, 62)
+        Me.txtColor.Location = New System.Drawing.Point(183, 75)
         Me.txtColor.MaxLength = 6
         Me.txtColor.Name = "txtColor"
-        Me.txtColor.Size = New System.Drawing.Size(45, 20)
-        Me.txtColor.TabIndex = 1
+        Me.txtColor.Size = New System.Drawing.Size(60, 22)
+        Me.txtColor.TabIndex = 3
+        Me.txtColor.TabStop = False
         '
         'txttColor
         '
         Me.txttColor.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.txttColor.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.txttColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txttColor.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txttColor.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txttColor.ForeColor = System.Drawing.Color.White
-        Me.txttColor.Location = New System.Drawing.Point(70, 62)
+        Me.txttColor.Location = New System.Drawing.Point(77, 75)
         Me.txttColor.MaxLength = 6
         Me.txttColor.Name = "txttColor"
-        Me.txttColor.Size = New System.Drawing.Size(45, 20)
-        Me.txttColor.TabIndex = 1
+        Me.txttColor.Size = New System.Drawing.Size(60, 22)
+        Me.txttColor.TabIndex = 2
+        Me.txttColor.TabStop = False
         '
         'txtText
         '
@@ -391,21 +495,23 @@ Partial Class frmMain
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtText.BackColor = System.Drawing.SystemColors.InactiveCaptionText
         Me.txtText.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txtText.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txtText.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtText.ForeColor = System.Drawing.Color.White
-        Me.txtText.Location = New System.Drawing.Point(35, 9)
+        Me.txtText.Location = New System.Drawing.Point(41, 13)
         Me.txtText.Name = "txtText"
-        Me.txtText.Size = New System.Drawing.Size(162, 20)
-        Me.txtText.TabIndex = 1
+        Me.txtText.Size = New System.Drawing.Size(199, 22)
+        Me.txtText.TabIndex = 0
+        Me.txtText.TabStop = False
         '
         'lblHeight
         '
         Me.lblHeight.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.lblHeight.AutoSize = True
+        Me.lblHeight.Font = New System.Drawing.Font("Microsoft Sans Serif", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblHeight.ForeColor = System.Drawing.Color.White
-        Me.lblHeight.Location = New System.Drawing.Point(107, 92)
+        Me.lblHeight.Location = New System.Drawing.Point(139, 104)
         Me.lblHeight.Name = "lblHeight"
-        Me.lblHeight.Size = New System.Drawing.Size(38, 13)
+        Me.lblHeight.Size = New System.Drawing.Size(50, 18)
         Me.lblHeight.TabIndex = 0
         Me.lblHeight.Text = "Height"
         '
@@ -413,10 +519,11 @@ Partial Class frmMain
         '
         Me.lblY.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.lblY.AutoSize = True
+        Me.lblY.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblY.ForeColor = System.Drawing.Color.White
-        Me.lblY.Location = New System.Drawing.Point(77, 118)
+        Me.lblY.Location = New System.Drawing.Point(85, 136)
         Me.lblY.Name = "lblY"
-        Me.lblY.Size = New System.Drawing.Size(14, 13)
+        Me.lblY.Size = New System.Drawing.Size(17, 16)
         Me.lblY.TabIndex = 0
         Me.lblY.Text = "Y"
         '
@@ -424,10 +531,11 @@ Partial Class frmMain
         '
         Me.lblWidth.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.lblWidth.AutoSize = True
+        Me.lblWidth.Font = New System.Drawing.Font("Microsoft Sans Serif", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblWidth.ForeColor = System.Drawing.Color.White
-        Me.lblWidth.Location = New System.Drawing.Point(24, 92)
+        Me.lblWidth.Location = New System.Drawing.Point(51, 104)
         Me.lblWidth.Name = "lblWidth"
-        Me.lblWidth.Size = New System.Drawing.Size(35, 13)
+        Me.lblWidth.Size = New System.Drawing.Size(46, 18)
         Me.lblWidth.TabIndex = 0
         Me.lblWidth.Text = "Width"
         '
@@ -435,10 +543,11 @@ Partial Class frmMain
         '
         Me.lblVisible.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.lblVisible.AutoSize = True
+        Me.lblVisible.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblVisible.ForeColor = System.Drawing.Color.White
-        Me.lblVisible.Location = New System.Drawing.Point(132, 118)
+        Me.lblVisible.Location = New System.Drawing.Point(167, 136)
         Me.lblVisible.Name = "lblVisible"
-        Me.lblVisible.Size = New System.Drawing.Size(37, 13)
+        Me.lblVisible.Size = New System.Drawing.Size(49, 16)
         Me.lblVisible.TabIndex = 0
         Me.lblVisible.Text = "Visible"
         '
@@ -446,10 +555,11 @@ Partial Class frmMain
         '
         Me.lblX.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.lblX.AutoSize = True
+        Me.lblX.Font = New System.Drawing.Font("Microsoft Sans Serif", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblX.ForeColor = System.Drawing.Color.White
-        Me.lblX.Location = New System.Drawing.Point(21, 118)
+        Me.lblX.Location = New System.Drawing.Point(18, 134)
         Me.lblX.Name = "lblX"
-        Me.lblX.Size = New System.Drawing.Size(14, 13)
+        Me.lblX.Size = New System.Drawing.Size(18, 18)
         Me.lblX.TabIndex = 0
         Me.lblX.Text = "X"
         '
@@ -457,20 +567,22 @@ Partial Class frmMain
         '
         Me.lblColor.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.lblColor.AutoSize = True
+        Me.lblColor.Font = New System.Drawing.Font("Microsoft Sans Serif", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblColor.ForeColor = System.Drawing.Color.White
-        Me.lblColor.Location = New System.Drawing.Point(117, 66)
+        Me.lblColor.Location = New System.Drawing.Point(139, 75)
         Me.lblColor.Name = "lblColor"
-        Me.lblColor.Size = New System.Drawing.Size(31, 13)
+        Me.lblColor.Size = New System.Drawing.Size(45, 18)
         Me.lblColor.TabIndex = 0
         Me.lblColor.Text = "Color"
         '
         'lblProgram
         '
         Me.lblProgram.AutoSize = True
+        Me.lblProgram.Font = New System.Drawing.Font("Microsoft Sans Serif", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblProgram.ForeColor = System.Drawing.Color.White
-        Me.lblProgram.Location = New System.Drawing.Point(3, 143)
+        Me.lblProgram.Location = New System.Drawing.Point(2, 164)
         Me.lblProgram.Name = "lblProgram"
-        Me.lblProgram.Size = New System.Drawing.Size(46, 13)
+        Me.lblProgram.Size = New System.Drawing.Size(66, 18)
         Me.lblProgram.TabIndex = 0
         Me.lblProgram.Text = "Program"
         '
@@ -478,30 +590,33 @@ Partial Class frmMain
         '
         Me.lbltColor.Anchor = System.Windows.Forms.AnchorStyles.Top
         Me.lbltColor.AutoSize = True
+        Me.lbltColor.Font = New System.Drawing.Font("Microsoft Sans Serif", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lbltColor.ForeColor = System.Drawing.Color.White
-        Me.lbltColor.Location = New System.Drawing.Point(11, 66)
+        Me.lbltColor.Location = New System.Drawing.Point(0, 75)
         Me.lbltColor.Name = "lbltColor"
-        Me.lbltColor.Size = New System.Drawing.Size(55, 13)
+        Me.lbltColor.Size = New System.Drawing.Size(77, 18)
         Me.lbltColor.TabIndex = 0
         Me.lbltColor.Text = "Text Color"
         '
         'lblPath
         '
         Me.lblPath.AutoSize = True
+        Me.lblPath.Font = New System.Drawing.Font("Microsoft Sans Serif", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblPath.ForeColor = System.Drawing.Color.White
-        Me.lblPath.Location = New System.Drawing.Point(1, 40)
+        Me.lblPath.Location = New System.Drawing.Point(2, 43)
         Me.lblPath.Name = "lblPath"
-        Me.lblPath.Size = New System.Drawing.Size(29, 13)
+        Me.lblPath.Size = New System.Drawing.Size(38, 18)
         Me.lblPath.TabIndex = 0
         Me.lblPath.Text = "Path"
         '
         'lblText
         '
         Me.lblText.AutoSize = True
+        Me.lblText.Font = New System.Drawing.Font("Microsoft Sans Serif", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblText.ForeColor = System.Drawing.Color.White
-        Me.lblText.Location = New System.Drawing.Point(1, 13)
+        Me.lblText.Location = New System.Drawing.Point(2, 13)
         Me.lblText.Name = "lblText"
-        Me.lblText.Size = New System.Drawing.Size(28, 13)
+        Me.lblText.Size = New System.Drawing.Size(36, 18)
         Me.lblText.TabIndex = 0
         Me.lblText.Text = "Text"
         '
@@ -546,11 +661,11 @@ Partial Class frmMain
         'tbtnSave
         '
         Me.tbtnSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.tbtnSave.Image = Global.Enid.My.Resources.Resources.disk
+        Me.tbtnSave.Image = Global.Enid.My.Resources.Resources.project_disk
         Me.tbtnSave.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.tbtnSave.Name = "tbtnSave"
         Me.tbtnSave.Size = New System.Drawing.Size(22, 20)
-        Me.tbtnSave.Text = "Save"
+        Me.tbtnSave.Text = "Save Project"
         '
         'tsSep2
         '
@@ -589,9 +704,21 @@ Partial Class frmMain
         Me.csTreeNodesRemove.Size = New System.Drawing.Size(117, 22)
         Me.csTreeNodesRemove.Text = "Remove"
         '
+        'csRecent
+        '
+        Me.csRecent.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ClearToolStripMenuItem})
+        Me.csRecent.Name = "csRecent"
+        Me.csRecent.Size = New System.Drawing.Size(102, 26)
+        '
+        'ClearToolStripMenuItem
+        '
+        Me.ClearToolStripMenuItem.Name = "ClearToolStripMenuItem"
+        Me.ClearToolStripMenuItem.Size = New System.Drawing.Size(101, 22)
+        Me.ClearToolStripMenuItem.Text = "Clear"
+        '
         'tbMain
         '
-        Me.tbMain.Controls.Add(Me.TabPage1)
+        Me.tbMain.Controls.Add(Me.tpStart)
         Me.tbMain.Cursor = System.Windows.Forms.Cursors.Default
         Me.tbMain.Dock = System.Windows.Forms.DockStyle.Fill
         Me.tbMain.ItemSize = New System.Drawing.Size(0, 15)
@@ -599,34 +726,209 @@ Partial Class frmMain
         Me.tbMain.Name = "tbMain"
         Me.tbMain.Padding = New System.Drawing.Point(9, 0)
         Me.tbMain.SelectedIndex = 0
-        Me.tbMain.Size = New System.Drawing.Size(1146, 726)
+        Me.tbMain.Size = New System.Drawing.Size(1107, 732)
         Me.tbMain.TabIndex = 0
+        Me.tbMain.TabStop = False
         Me.tbMain.Tag = ""
         '
-        'TabPage1
+        'tpStart
         '
-        Me.TabPage1.BackColor = System.Drawing.SystemColors.InactiveCaptionText
-        Me.TabPage1.Location = New System.Drawing.Point(4, 19)
-        Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage1.Size = New System.Drawing.Size(1138, 703)
-        Me.TabPage1.TabIndex = 0
-        Me.TabPage1.Tag = "start"
-        Me.TabPage1.Text = "Start Page"
-        Me.TabPage1.UseVisualStyleBackColor = True
+        Me.tpStart.BackColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.tpStart.Controls.Add(Me.lnkLocatePlugins)
+        Me.tpStart.Controls.Add(Me.lvProjects)
+        Me.tpStart.Controls.Add(Me.lvPlugins)
+        Me.tpStart.Controls.Add(Me.Label4)
+        Me.tpStart.Controls.Add(Me.lblcurProject)
+        Me.tpStart.Controls.Add(Me.Label2)
+        Me.tpStart.Controls.Add(Me.lnkOpenProject)
+        Me.tpStart.Controls.Add(Me.lnkNewProject)
+        Me.tpStart.Controls.Add(Me.Label1)
+        Me.tpStart.Controls.Add(Me.ShapeContainer1)
+        Me.tpStart.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.tpStart.Location = New System.Drawing.Point(4, 19)
+        Me.tpStart.Name = "tpStart"
+        Me.tpStart.Padding = New System.Windows.Forms.Padding(3)
+        Me.tpStart.Size = New System.Drawing.Size(1099, 709)
+        Me.tpStart.TabIndex = 0
+        Me.tpStart.Tag = "start"
+        Me.tpStart.Text = "  Enid"
+        Me.tpStart.UseVisualStyleBackColor = True
+        '
+        'lnkLocatePlugins
+        '
+        Me.lnkLocatePlugins.ActiveLinkColor = System.Drawing.SystemColors.Highlight
+        Me.lnkLocatePlugins.AutoSize = True
+        Me.lnkLocatePlugins.BackColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.lnkLocatePlugins.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lnkLocatePlugins.ForeColor = System.Drawing.Color.White
+        Me.lnkLocatePlugins.Image = Global.Enid.My.Resources.Resources.plugin_go
+        Me.lnkLocatePlugins.ImageAlign = System.Drawing.ContentAlignment.TopLeft
+        Me.lnkLocatePlugins.LinkArea = New System.Windows.Forms.LinkArea(4, 18)
+        Me.lnkLocatePlugins.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
+        Me.lnkLocatePlugins.LinkColor = System.Drawing.Color.White
+        Me.lnkLocatePlugins.Location = New System.Drawing.Point(68, 454)
+        Me.lnkLocatePlugins.Name = "lnkLocatePlugins"
+        Me.lnkLocatePlugins.Size = New System.Drawing.Size(131, 24)
+        Me.lnkLocatePlugins.TabIndex = 0
+        Me.lnkLocatePlugins.TabStop = True
+        Me.lnkLocatePlugins.Text = "    Locate Plugins"
+        Me.lnkLocatePlugins.UseCompatibleTextRendering = True
+        Me.lnkLocatePlugins.VisitedLinkColor = System.Drawing.Color.White
+        '
+        'lvProjects
+        '
+        Me.lvProjects.AutoArrange = False
+        Me.lvProjects.BackColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.lvProjects.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.lvProjects.ContextMenuStrip = Me.csRecent
+        Me.lvProjects.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lvProjects.ForeColor = System.Drawing.Color.White
+        Me.lvProjects.LargeImageList = Me.imglstProject
+        Me.lvProjects.Location = New System.Drawing.Point(17, 36)
+        Me.lvProjects.Name = "lvProjects"
+        Me.lvProjects.Scrollable = False
+        Me.lvProjects.Size = New System.Drawing.Size(232, 123)
+        Me.lvProjects.SmallImageList = Me.imglstProject
+        Me.lvProjects.TabIndex = 4
+        Me.lvProjects.TileSize = New System.Drawing.Size(230, 20)
+        Me.lvProjects.UseCompatibleStateImageBehavior = False
+        Me.lvProjects.View = System.Windows.Forms.View.SmallIcon
+        '
+        'lvPlugins
+        '
+        Me.lvPlugins.BackColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.lvPlugins.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.lvPlugins.Font = New System.Drawing.Font("Calibri", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lvPlugins.ForeColor = System.Drawing.Color.White
+        Me.lvPlugins.Location = New System.Drawing.Point(17, 236)
+        Me.lvPlugins.Name = "lvPlugins"
+        Me.lvPlugins.Size = New System.Drawing.Size(232, 206)
+        Me.lvPlugins.SmallImageList = Me.imglstPlugins
+        Me.lvPlugins.TabIndex = 4
+        Me.lvPlugins.TileSize = New System.Drawing.Size(230, 20)
+        Me.lvPlugins.UseCompatibleStateImageBehavior = False
+        Me.lvPlugins.View = System.Windows.Forms.View.Tile
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.BackColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label4.ForeColor = System.Drawing.Color.White
+        Me.Label4.Location = New System.Drawing.Point(56, 209)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(155, 24)
+        Me.Label4.TabIndex = 3
+        Me.Label4.Text = "Loaded Plugins"
+        Me.Label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'lblcurProject
+        '
+        Me.lblcurProject.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblcurProject.AutoSize = True
+        Me.lblcurProject.BackColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.lblcurProject.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblcurProject.ForeColor = System.Drawing.Color.White
+        Me.lblcurProject.Location = New System.Drawing.Point(591, 11)
+        Me.lblcurProject.Name = "lblcurProject"
+        Me.lblcurProject.Size = New System.Drawing.Size(150, 24)
+        Me.lblcurProject.TabIndex = 3
+        Me.lblcurProject.Text = "Current Project"
+        Me.lblcurProject.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'Label2
+        '
+        Me.Label2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.Label2.AutoSize = True
+        Me.Label2.BackColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label2.ForeColor = System.Drawing.Color.White
+        Me.Label2.Location = New System.Drawing.Point(106, 504)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(54, 24)
+        Me.Label2.TabIndex = 3
+        Me.Label2.Text = "Help"
+        Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'lnkOpenProject
+        '
+        Me.lnkOpenProject.ActiveLinkColor = System.Drawing.SystemColors.Highlight
+        Me.lnkOpenProject.AutoSize = True
+        Me.lnkOpenProject.BackColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.lnkOpenProject.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lnkOpenProject.ForeColor = System.Drawing.Color.White
+        Me.lnkOpenProject.Image = Global.Enid.My.Resources.Resources.project_go
+        Me.lnkOpenProject.ImageAlign = System.Drawing.ContentAlignment.TopLeft
+        Me.lnkOpenProject.LinkArea = New System.Windows.Forms.LinkArea(4, 16)
+        Me.lnkOpenProject.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
+        Me.lnkOpenProject.LinkColor = System.Drawing.Color.White
+        Me.lnkOpenProject.Location = New System.Drawing.Point(132, 162)
+        Me.lnkOpenProject.Name = "lnkOpenProject"
+        Me.lnkOpenProject.Size = New System.Drawing.Size(119, 24)
+        Me.lnkOpenProject.TabIndex = 0
+        Me.lnkOpenProject.TabStop = True
+        Me.lnkOpenProject.Text = "    Open Project"
+        Me.lnkOpenProject.UseCompatibleTextRendering = True
+        Me.lnkOpenProject.VisitedLinkColor = System.Drawing.Color.White
+        '
+        'lnkNewProject
+        '
+        Me.lnkNewProject.ActiveLinkColor = System.Drawing.SystemColors.Highlight
+        Me.lnkNewProject.AutoSize = True
+        Me.lnkNewProject.BackColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.lnkNewProject.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lnkNewProject.ForeColor = System.Drawing.Color.White
+        Me.lnkNewProject.Image = Global.Enid.My.Resources.Resources.report_add
+        Me.lnkNewProject.ImageAlign = System.Drawing.ContentAlignment.TopLeft
+        Me.lnkNewProject.LinkArea = New System.Windows.Forms.LinkArea(4, 15)
+        Me.lnkNewProject.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
+        Me.lnkNewProject.LinkColor = System.Drawing.Color.White
+        Me.lnkNewProject.Location = New System.Drawing.Point(17, 162)
+        Me.lnkNewProject.Name = "lnkNewProject"
+        Me.lnkNewProject.Size = New System.Drawing.Size(112, 24)
+        Me.lnkNewProject.TabIndex = 0
+        Me.lnkNewProject.TabStop = True
+        Me.lnkNewProject.Text = "    New Project"
+        Me.lnkNewProject.UseCompatibleTextRendering = True
+        Me.lnkNewProject.VisitedLinkColor = System.Drawing.Color.White
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.BackColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label1.ForeColor = System.Drawing.Color.White
+        Me.Label1.Location = New System.Drawing.Point(55, 9)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(157, 24)
+        Me.Label1.TabIndex = 2
+        Me.Label1.Text = "Recent Projects"
+        Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'ShapeContainer1
+        '
+        Me.ShapeContainer1.Location = New System.Drawing.Point(3, 3)
+        Me.ShapeContainer1.Margin = New System.Windows.Forms.Padding(0)
+        Me.ShapeContainer1.Name = "ShapeContainer1"
+        Me.ShapeContainer1.Shapes.AddRange(New Microsoft.VisualBasic.PowerPacks.Shape() {Me.rectPlugins, Me.rectHelp, Me.rectcurProjects, Me.rectProjects})
+        Me.ShapeContainer1.Size = New System.Drawing.Size(1093, 703)
+        Me.ShapeContainer1.TabIndex = 0
+        Me.ShapeContainer1.TabStop = False
         '
         'frmMain
         '
         Me.AllowDrop = True
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None
         Me.BackColor = System.Drawing.SystemColors.InactiveCaptionText
-        Me.ClientSize = New System.Drawing.Size(1384, 730)
+        Me.ClientSize = New System.Drawing.Size(1384, 736)
         Me.Controls.Add(Me.tsContainer)
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
-        Me.MinimumSize = New System.Drawing.Size(400, 300)
+        Me.MinimumSize = New System.Drawing.Size(400, 768)
         Me.Name = "frmMain"
+        Me.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide
         Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual
         Me.Text = "Enid"
         Me.csButtons.ResumeLayout(False)
@@ -645,7 +947,10 @@ Partial Class frmMain
         Me.tsMain.ResumeLayout(False)
         Me.tsMain.PerformLayout()
         Me.csTreeNodes.ResumeLayout(False)
+        Me.csRecent.ResumeLayout(False)
         Me.tbMain.ResumeLayout(False)
+        Me.tpStart.ResumeLayout(False)
+        Me.tpStart.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -682,7 +987,6 @@ Partial Class frmMain
     Friend WithEvents lblColor As System.Windows.Forms.Label
     Friend WithEvents lbltColor As System.Windows.Forms.Label
     Friend WithEvents colorDialog As System.Windows.Forms.ColorDialog
-    Friend WithEvents chkVisible As System.Windows.Forms.CheckBox
     Friend WithEvents lblVisible As System.Windows.Forms.Label
     Friend WithEvents tvItems As System.Windows.Forms.TreeView
     Friend WithEvents imglstTree As System.Windows.Forms.ImageList
@@ -693,6 +997,25 @@ Partial Class frmMain
     Friend WithEvents csTreeNodes As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents csTreeNodesRemove As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents tbMain As Enid.customTabControl
-    Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
+    Friend WithEvents tpStart As System.Windows.Forms.TabPage
+    Friend WithEvents ShapeContainer1 As Microsoft.VisualBasic.PowerPacks.ShapeContainer
+    Friend WithEvents rectProjects As Microsoft.VisualBasic.PowerPacks.RectangleShape
+    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents lnkNewProject As System.Windows.Forms.LinkLabel
+    Friend WithEvents lnkOpenProject As System.Windows.Forms.LinkLabel
+    Friend WithEvents rectcurProjects As Microsoft.VisualBasic.PowerPacks.RectangleShape
+    Friend WithEvents chkVisible As System.Windows.Forms.CheckBox
+    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents rectHelp As Microsoft.VisualBasic.PowerPacks.RectangleShape
+    Friend WithEvents lblcurProject As System.Windows.Forms.Label
+    Friend WithEvents rectPlugins As Microsoft.VisualBasic.PowerPacks.RectangleShape
+    Friend WithEvents Label4 As System.Windows.Forms.Label
+    Friend WithEvents lvPlugins As System.Windows.Forms.ListView
+    Friend WithEvents lvProjects As System.Windows.Forms.ListView
+    Friend WithEvents imglstProject As System.Windows.Forms.ImageList
+    Friend WithEvents imglstPlugins As System.Windows.Forms.ImageList
+    Friend WithEvents lnkLocatePlugins As System.Windows.Forms.LinkLabel
+    Friend WithEvents csRecent As System.Windows.Forms.ContextMenuStrip
+    Friend WithEvents ClearToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 
 End Class

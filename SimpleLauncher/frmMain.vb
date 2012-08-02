@@ -6,10 +6,13 @@ Public Class frmMain
     Public tmpControl As MagicControl
 
     Private isFullScreen As Boolean = False
-    Private datFile As String = My.Application.Info.DirectoryPath.ToString() & "\data.xml"
     Private isTabNodeSelected As Boolean = False
+    Private panel2Enabled As Boolean = False
+    Private selectedOnRedraw As Boolean = False
+
+    Private Const strNone As String = "                  (None)                  "
 #End Region
-#Region "Button"
+#Region "Buttons"
     Public Sub Button_MouseDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs)
         Dim activeButton As Button
         activeButton = sender
@@ -69,18 +72,18 @@ Public Class frmMain
     Private Sub tbtnLock_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbtnLock.Click
         If frmMainLocked Then
             tbtnLock.Image = My.Resources.lock_open
-            Me.Text = tbMain.SelectedTab.Text & " - Enid"
+            Me.Text = Strings.Left(Me.Text, Me.Text.Length - Len(" (Locked)"))
             frmMainLocked = False
         Else
             tbtnLock.Image = My.Resources.lock
-            Me.Text = tbMain.SelectedTab.Text & " (Locked) - Enid"
+            Me.Text = Me.Text & " (Locked)"
             frmMainLocked = True
         End If
     End Sub
 
     Private Sub tbtnSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbtnSave.Click
         tbMain.SelectedTab.Cursor = Cursors.WaitCursor
-        writeSaveFile(tbMain, datFile)
+        writeSaveFile(tbMain, curProject.Path)
         SaveSettings()
         tbMain.SelectedTab.Cursor = Cursors.Default
     End Sub
@@ -144,6 +147,7 @@ Public Class frmMain
     Private Function isNodeButton(ByVal node As TreeNode) As Boolean
         If node.Level = 0 Then Return False
         For Each tp As TabPage In tbMain.TabPages
+            If tp.Tag = "start" Then Continue For
             For Each control As Button In tp.Controls
                 If control.Text = node.Text Then Return True
             Next
@@ -180,7 +184,10 @@ Public Class frmMain
                 End If
 
                 tvItems.Nodes.Item(tvItems.Nodes.Count - 1).Nodes.Add(item)
-                If item.Text = selected Then tvItems.SelectedNode = item
+                If item.Text = selected Then
+                    selectedOnRedraw = True
+                    tvItems.SelectedNode = item
+                End If
             Next
         Next
         tvItems.ExpandAll()
@@ -197,6 +204,7 @@ Public Class frmMain
                         tbMain.SelectedTab.Controls.Remove(control)
                         CreateList()
                         ClearProperties()
+                        Exit For
                     End If
                 End If
             Next
@@ -208,7 +216,7 @@ Public Class frmMain
             e.CancelEdit = True
         Else
             If e.Node Is tvItems.Nodes.Item(0) Then
-                Me.Text = e.Label & " - Enid"
+                Me.Text = e.Label & " - Enid" & IIf(frmMainLocked, " (Locked)", "")
                 tbMain.SelectedTab.Text = e.Label
                 Exit Sub
             End If
@@ -222,36 +230,46 @@ Public Class frmMain
         End If
     End Sub
 
+    Private Sub tvItems_BeforeCollapse(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewCancelEventArgs) Handles tvItems.BeforeCollapse
+        e.Cancel = True
+    End Sub
+
     Private Sub tvItems_BeforeSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewCancelEventArgs) Handles tvItems.BeforeSelect
         LockWindowUpdate(tvItems.Handle)
     End Sub
 
     Private Sub tvItems_AfterSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles tvItems.AfterSelect
+        If selectedOnRedraw Then selectedOnRedraw = False : Exit Sub
+
         If isNodeButton(e.Node) Then
             If e.Node.Parent.Text <> tbMain.SelectedTab.Text Then
                 For Each tp As TabPage In tbMain.TabPages
+                    If tp.Tag = "start" Then Continue For
                     If e.Node.Parent.Text = tp.Text Then
                         isTabNodeSelected = True
                         tbMain.SelectTab(tp)
+                        tvItems.Focus()
                     End If
                 Next
             End If
 
             For Each control As Button In tbMain.SelectedTab.Controls
                 If control.Text = e.Node.Text Then
-                    splitSide.Panel2.Enabled = True
+                    EnablePanel2()
                     SetProperties(control)
                     Exit For
                 End If
             Next
         Else
             For Each tp As TabPage In tbMain.TabPages
+                If tp.Tag = "start" Then Continue For
                 If e.Node.Text = tp.Text Then
                     tbMain.SelectTab(tp)
+                    tvItems.Focus()
                     Exit For
                 End If
             Next
-            splitSide.Panel2.Enabled = False
+            DisablePanel2()
             ClearProperties()
         End If
         LockWindowUpdate(0)
@@ -280,6 +298,7 @@ Public Class frmMain
             tvItems.SelectedNode = tvItems.GetNodeAt(e.Location)
             If frmMainLocked AndAlso tvItems.SelectedNode.Level > 0 Then
                 For Each tp As TabPage In tbMain.TabPages
+                    If tp.Tag = "start" Then Continue For
                     For Each control As Button In tp.Controls
                         If control.Text = tvItems.SelectedNode.Text Then
                             Button_MouseDown(control, e)
@@ -289,31 +308,34 @@ Public Class frmMain
             End If
         End If
     End Sub
-
-    Private Sub tvItems_BeforeCollapse(ByVal sender As System.Object, ByVal e As System.Windows.Forms.TreeViewCancelEventArgs) Handles tvItems.BeforeCollapse
-        e.Cancel = True
-    End Sub
 #End Region
 #Region "tbMain"
+    Private Sub CloseAllTabs()
+        For Each tp As TabPage In tbMain.TabPages
+            If tp.Tag = "start" Then Continue For
+            tbMain.TabPages.Remove(tp)
+        Next
+    End Sub
+
     Private Sub tbMain_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbMain.SelectedIndexChanged
         If isTabNodeSelected Then
             isTabNodeSelected = False
             Exit Sub
         End If
 
-        If tbMain.SelectedTab.Text = "Start Page" Then
-            splitMain.Panel2Collapsed = True
-            Me.Text = "Enid"
+        If tbMain.SelectedTab.Tag = "start" Then
+            Me.Text = curProject.Name & " - Enid" & IIf(frmMainLocked, " (Locked)", "")
         Else
-            splitMain.Panel2Collapsed = False
             For Each node As TreeNode In tvItems.Nodes
                 If node.Text = tbMain.SelectedTab.Text Then
                     tvItems.SelectedNode = node
-                    Me.Text = tbMain.SelectedTab.Text & IIf(frmMainLocked, " (Locked) - Enid", " - Enid")
+                    Me.Text = tbMain.SelectedTab.Text & " - Enid" & IIf(frmMainLocked, " (Locked)", "")
                     Exit For
                 End If
             Next
         End If
+
+        frmMain_Resize(Me, EventArgs.Empty)
     End Sub
 
     Private Sub tbMain_TabsReordered(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbMain.TabsReordered
@@ -337,6 +359,7 @@ Public Class frmMain
 
     Private Function searchForExisting(ByVal text As String) As Boolean
         For Each tp As TabPage In tbMain.TabPages
+            If tp.Tag = "start" Then Continue For
             For Each control As Button In tp.Controls
                 If control.Text = text Then
                     Return True
@@ -396,7 +419,6 @@ Public Class frmMain
             lastPoint = New Point(-1, -1)
             lastSize = New Size(-1, -1)
             CreateList()
-            tvItems.SelectedNode = tvItems.Nodes.Item(0).Nodes.Item(0)
         End If
     End Sub
 
@@ -410,34 +432,47 @@ Public Class frmMain
 
     Private Sub frmMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         PrepareImageList()
-        tbMain.SelectedIndex = 1
-        tbMain.TabPages(0).BackColor = Color.FromArgb(255, 60, 70, 75)
-
+        FillRecentProjects()
+        DisablePanel2()
         LoadSettings()
-        If My.Computer.FileSystem.FileExists(datFile) Then
-            loadSaveFile(tbMain, datFile)
-            tbMain.SelectedIndex = 1
-            Me.Text = tbMain.SelectedTab.Text & " - Enid"
 
-            ClearProperties()
-            CreateList()
-        Else
-            tbMain.SelectedTab.Text = "Untitled"
-            Me.Text = tbMain.SelectedTab.Text & " - Enid"
+        curProject.isOpened = False
+        tbMain.TabPages(0).BackColor = Color.FromArgb(255, 60, 70, 75)
+        If My.Settings.recentProjects Is Nothing Then My.Settings.recentProjects = New Specialized.StringCollection()
 
-            Dim projectNode As New TreeNode("Untitled")
-            projectNode.ImageKey = "folder"
-            projectNode.SelectedImageKey = "folder"
-            tvItems.Nodes.Add(projectNode)
-        End If
+        'If My.Computer.FileSystem.FileExists(datFile) Then
+        '    loadSaveFile(tbMain, datFile)
+        '    tbMain.SelectedIndex = 1
+        '    Me.Text = tbMain.SelectedTab.Text & " - Enid"
+
+        '    ClearProperties()
+        '    CreateList()
+        'Else
+        '    tbMain.SelectedTab.Text = "Untitled"
+        '    Me.Text = tbMain.SelectedTab.Text & " - Enid"
+
+        '    Dim projectNode As New TreeNode("Untitled")
+        '    projectNode.ImageKey = "folder"
+        '    projectNode.SelectedImageKey = "folder"
+        '    tvItems.Nodes.Add(projectNode)
+        'End If
     End Sub
 
     Private Sub frmMain_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
         If MsgBox("You will lose any unsaved data!" & vbCrLf & "Are you sure that you want to quit?", MsgBoxStyle.YesNo Or MsgBoxStyle.Information, "Enid") = MsgBoxResult.No Then
             e.Cancel = True
         Else
+            My.Settings.Save()
             e.Cancel = False
         End If
+    End Sub
+
+    Private Sub frmMain_Resize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Resize
+        rectcurProjects.Width = (tbMain.SelectedTab.Size.Width - 266) - 9
+        rectcurProjects.Height = (tbMain.SelectedTab.Size.Height - 3) - 8
+        rectHelp.Height = (tbMain.SelectedTab.Size.Height - 492) - 10
+
+        lblcurProject.Left = ((rectcurProjects.Left + rectcurProjects.Width) / 2) + (lblcurProject.Width / 2)
     End Sub
 
     Private Sub frmMain_KeyDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
@@ -446,6 +481,14 @@ Public Class frmMain
         ElseIf e.KeyCode = Keys.F4 Then
             If splitMain.Panel2Collapsed Then splitMain.Panel2Collapsed = False Else splitMain.Panel2Collapsed = True
         End If
+    End Sub
+
+    Private Sub splitMain_SplitterMoved(ByVal sender As System.Object, ByVal e As System.Windows.Forms.SplitterEventArgs) Handles splitMain.SplitterMoved
+        Me.Focus()
+    End Sub
+
+    Private Sub splitMain_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles splitMain.MouseUp
+        Me.Focus()
     End Sub
 
     Private Sub splitMain_Panel1_Click(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles splitMain.Panel1.Click
@@ -484,12 +527,81 @@ Public Class frmMain
         imglstTree.Images.Add("music", My.Resources.music)
         imglstTree.Images.Add("photo", My.Resources.photo)
         imglstTree.Images.Add("blank", My.Resources.background)
-
         tvItems.ImageKey = "default"
         tvItems.SelectedImageKey = "default"
+
+        imglstProject.Images.Add("project", My.Resources.report)
+        imglstProject.Images.Add("no_project", My.Resources.report_delete)
+
+        imglstPlugins.Images.Add("plugin", My.Resources.plugin)
     End Sub
 #End Region
 #Region "Properties Bar"
+
+    Private Sub EnablePanel2()
+        panel2Enabled = True
+
+        lblText.ForeColor = Color.White
+        lblPath.ForeColor = Color.White
+        lblColor.ForeColor = Color.White
+        lbltColor.ForeColor = Color.White
+        lblWidth.ForeColor = Color.White
+        lblHeight.ForeColor = Color.White
+        lblX.ForeColor = Color.White
+        lblY.ForeColor = Color.White
+        lblVisible.ForeColor = Color.White
+        lblProgram.ForeColor = Color.White
+        chkVisible.FlatAppearance.BorderColor = SystemColors.ControlDarkDark
+        chkVisible.FlatAppearance.CheckedBackColor = SystemColors.ActiveCaption
+
+        txtText.Enabled = True
+        txtPath.Enabled = True
+        btnPath.Enabled = True
+        btnPath.Refresh()
+        txttColor.Enabled = True
+        txtColor.Enabled = True
+        txtWidth.Enabled = True
+        txtHeight.Enabled = True
+        txtX.Enabled = True
+        txtY.Enabled = True
+        chkVisible.Enabled = True
+        txtProgram.Enabled = True
+        btnProgram.Enabled = True
+        btnProgram.Refresh()
+    End Sub
+
+    Private Sub DisablePanel2()
+        panel2Enabled = False
+
+        lblText.ForeColor = Color.DarkGray
+        lblPath.ForeColor = Color.DarkGray
+        lblColor.ForeColor = Color.DarkGray
+        lbltColor.ForeColor = Color.DarkGray
+        lblWidth.ForeColor = Color.DarkGray
+        lblHeight.ForeColor = Color.DarkGray
+        lblX.ForeColor = Color.DarkGray
+        lblY.ForeColor = Color.DarkGray
+        lblVisible.ForeColor = Color.DarkGray
+        lblProgram.ForeColor = Color.DarkGray
+        chkVisible.FlatAppearance.BorderColor = Color.DarkGray
+        chkVisible.FlatAppearance.CheckedBackColor = SystemColors.InactiveCaptionText
+
+        txtText.Enabled = False
+        txtPath.Enabled = False
+        btnPath.Enabled = False
+        btnPath.Refresh()
+        txttColor.Enabled = False
+        txtColor.Enabled = False
+        txtWidth.Enabled = False
+        txtHeight.Enabled = False
+        txtX.Enabled = False
+        txtY.Enabled = False
+        chkVisible.Enabled = False
+        txtProgram.Enabled = False
+        btnProgram.Enabled = False
+        btnProgram.Refresh()
+    End Sub
+
     Private Sub ClearProperties()
         txtText.Text = ""
         txtPath.Text = ""
@@ -519,16 +631,17 @@ Public Class frmMain
     End Sub
 
     Private Sub PaintEllipsis(ByVal sender As System.Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles btnPath.Paint, btnProgram.Paint
-        If splitSide.Panel2.Enabled Then
-            e.Graphics.DrawString("...", New Font("Microsoft Sans Serif", 8.25, FontStyle.Regular, GraphicsUnit.Point, 0), Brushes.White, 4, 1)
+        If panel2Enabled Then
+            e.Graphics.DrawString("...", New Font("Microsoft Sans Serif", 8.25, FontStyle.Regular, GraphicsUnit.Point, 0), Brushes.White, 4, 2)
         Else
-            e.Graphics.DrawString("...", New Font("Microsoft Sans Serif", 8.25, FontStyle.Regular, GraphicsUnit.Point, 0), Brushes.DarkGray, 4, 1)
+            e.Graphics.DrawString("...", New Font("Microsoft Sans Serif", 8.25, FontStyle.Regular, GraphicsUnit.Point, 0), Brushes.DarkGray, 4, 2)
         End If
     End Sub
 
     Private Sub btnPath_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPath.Click
         openDialog.InitialDirectory = RemoveFile(txtPath.Text)
         openDialog.FileName = RemovePath(txtPath.Text)
+        openDialog.Filter = "All Files|*.*"
         If openDialog.ShowDialog() = Windows.Forms.DialogResult.OK Then
             txtPath.Text = openDialog.FileName
         End If
@@ -537,6 +650,7 @@ Public Class frmMain
     Private Sub btnProgram_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnProgram.Click
         openDialog.InitialDirectory = RemoveFile(txtProgram.Text)
         openDialog.FileName = RemovePath(txtProgram.Text)
+        openDialog.Filter = "All Files|*.*"
         If openDialog.ShowDialog() = Windows.Forms.DialogResult.OK Then
             txtProgram.Text = openDialog.FileName
         End If
@@ -659,6 +773,155 @@ Public Class frmMain
         Dim control As Control = sender
         If control.Tag Is Nothing Then control.Tag = txtPath.Text & "|" & txtProgram.Text & "|True" : Exit Sub
         control.Tag = txtPath.Text & "|" & txtProgram.Text & "|" & Split(control.Tag, "|")(2)
+    End Sub
+#End Region
+#Region "Start Page"
+    Private Sub ResetAndLoad()
+        ClearProperties()
+        CloseAllTabs()
+        tvItems.Nodes.Clear()
+        loadSaveFile(tbMain, curProject.Path)
+        tbMain.SelectedIndex = 1
+        CreateList()
+        Me.Text = tbMain.SelectedTab.Text & " - Enid" & IIf(frmMainLocked, " (Locked)", "")
+    End Sub
+
+    Private Sub AddProjectToRecent()
+        Dim newItem As New ListViewItem
+        newItem.Text = RemovePath(curProject.Path)
+        newItem.Tag = curProject.Path
+        newItem.ImageKey = "project"
+        If Strings.Trim(lvProjects.Items(0).Text) = "(None)" Then
+            lvProjects.Items.Clear()
+            lvProjects.Items.Add(newItem)
+        Else
+            For Each item As ListViewItem In lvProjects.Items
+                If item.Tag = newItem.Tag Then
+                    lvProjects.Items.Remove(item)
+                    lvProjects.Items.Insert(0, newItem)
+                    UpdateRecentProjectSettings()
+                    Exit Sub
+                End If
+            Next
+
+            If lvProjects.Items.Count = 5 Then
+                lvProjects.Items.RemoveAt(4)
+                lvProjects.Items.Insert(0, newItem)
+            Else
+                lvProjects.Items.Insert(0, newItem)
+            End If
+        End If
+
+        UpdateRecentProjectSettings()
+    End Sub
+
+    Private Sub FillRecentProjects()
+        If My.Settings.recentProjects.Count > 0 And My.Settings.recentProjects IsNot Nothing Then
+            For i As Short = 0 To (My.Settings.recentProjects.Count - 1)
+                Dim newItem As New ListViewItem
+                newItem.Text = RemovePath(My.Settings.recentProjects.Item(i))
+                newItem.Tag = My.Settings.recentProjects.Item(i)
+                If My.Computer.FileSystem.FileExists(newItem.Tag) Then
+                    newItem.ImageKey = "project"
+                Else
+                    newItem.ImageKey = "no_project"
+                End If
+                lvProjects.Items.Add(newItem)
+            Next
+        Else
+            lvProjects.Items.Add(strNone)
+        End If
+    End Sub
+
+    Private Sub UpdateRecentProjectSettings()
+        My.Settings.recentProjects.Clear()
+        For Each item As ListViewItem In lvProjects.Items
+            My.Settings.recentProjects.Add(item.Tag)
+        Next
+    End Sub
+
+    Private Sub lvProjects_MouseDoubleClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles lvProjects.MouseDoubleClick
+        Dim clickedItem As ListViewItem = lvProjects.GetItemAt(e.X, e.Y)
+        Dim nextPath As String = clickedItem.Tag
+
+        If Not My.Computer.FileSystem.FileExists(clickedItem.Tag) Then
+            lvProjects.Items(clickedItem.Index).ImageKey = "no_project"
+            If MsgBox("This project does not exist!" & vbCrLf & vbCrLf & "Would you like to locate it yourself?", MsgBoxStyle.YesNo + MsgBoxStyle.Critical) = MsgBoxResult.Yes Then
+                openDialog.Filter = "Enid Projects|*.enid|All Files|*.*"
+                If openDialog.ShowDialog() = Windows.Forms.DialogResult.OK Then
+                    lvProjects.Items(clickedItem.Index).Text = RemovePath(openDialog.FileName)
+                    lvProjects.Items(clickedItem.Index).Tag = openDialog.FileName
+                    nextPath = openDialog.FileName
+                Else
+                    Exit Sub
+                End If
+            Else
+                lvProjects.Items.Remove(clickedItem)
+                UpdateRecentProjectSettings()
+                Exit Sub
+            End If
+        End If
+
+        If curProject.isOpened Then
+            Select Case MsgBox("Would you like to save your current project before opening another?", MsgBoxStyle.YesNoCancel + MsgBoxStyle.Information)
+                Case MsgBoxResult.Yes
+                    tbMain.SelectedTab.Cursor = Cursors.WaitCursor
+                    writeSaveFile(tbMain, curProject.Path)
+                    SaveSettings()
+                    tbMain.SelectedTab.Cursor = Cursors.Default
+                Case MsgBoxResult.Cancel
+                    Exit Sub
+            End Select
+        End If
+
+        curProject.isOpened = False
+        curProject.Path = nextPath
+        ResetAndLoad()
+        AddProjectToRecent()
+        lvProjects.Clear()
+        FillRecentProjects()
+    End Sub
+
+    Private Sub lvProjects_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lvProjects.SelectedIndexChanged
+        If Strings.Trim(lvProjects.Items(0).Text) = "(None)" Then
+            lvProjects.Items(0).Selected = False
+        End If
+    End Sub
+
+    Private Sub lnkOpenProject_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lnkOpenProject.LinkClicked
+        If e.Button = Windows.Forms.MouseButtons.Left Then
+            openDialog.Filter = "Enid Projects|*.enid|All Files|*.*"
+            If openDialog.ShowDialog() = Windows.Forms.DialogResult.OK AndAlso My.Computer.FileSystem.FileExists(openDialog.FileName) Then
+                If curProject.isOpened Then
+                    Select Case MsgBox("Would you like to save your current project before opening another?", MsgBoxStyle.YesNoCancel + MsgBoxStyle.Information)
+                        Case MsgBoxResult.Yes
+                            tbMain.SelectedTab.Cursor = Cursors.WaitCursor
+                            writeSaveFile(tbMain, curProject.Path)
+                            SaveSettings()
+                            tbMain.SelectedTab.Cursor = Cursors.Default
+                        Case MsgBoxResult.Cancel
+                            Exit Sub
+                    End Select
+                End If
+                curProject.isOpened = False
+                curProject.Path = openDialog.FileName
+                ResetAndLoad()
+                AddProjectToRecent()
+                lvProjects.Clear()
+                FillRecentProjects()
+            End If
+        End If
+    End Sub
+
+    Private Sub ClearToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ClearToolStripMenuItem.Click
+        lvProjects.Clear()
+        lvProjects.Items.Add(strNone)
+        My.Settings.recentProjects.Clear()
+        My.Settings.Save()
+    End Sub
+
+    Private Sub lnkLocatePlugins_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lnkLocatePlugins.LinkClicked
+        ' TODO Plugins
     End Sub
 #End Region
 End Class

@@ -233,6 +233,16 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="blue_pill.ico" />
+    <None Include="Resources\plugin_go.png" />
+    <None Include="Resources\report_delete.png" />
+    <None Include="Resources\report.png" />
+    <None Include="Resources\plugin_delete.png" />
+    <None Include="Resources\plugin.png" />
+    <None Include="Resources\report_add1.png" />
+    <None Include="Resources\report_add.png" />
+    <None Include="Resources\report_go.png" />
+    <None Include="Resources\report_disk.png" />
+    <None Include="Resources\project_add.bmp" />
     <None Include="app.config" />
     <None Include="Resources\photo.ico" />
     <None Include="Resources\music.ico" />

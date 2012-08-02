@@ -120,7 +120,7 @@ Public Class customTabControl
         format.LineAlignment = StringAlignment.Center
         format.Trimming = StringTrimming.EllipsisCharacter
 
-        Dim tabFont As New Font("Microsoft Sans Serif", 7.5, Me.Font.Style, Me.Font.Unit)
+        Dim tabFont As New Font("Trebuchet MS", 7.8, Me.Font.Style, Me.Font.Unit)
         If index = Me.SelectedIndex Then
             foreBrush = Brushes.Black
             tabFont = New Font(tabFont, FontStyle.Bold)
@@ -132,7 +132,8 @@ Public Class customTabControl
 #Region "Events"
     Protected Overrides Sub OnMouseDown(ByVal e As System.Windows.Forms.MouseEventArgs)
         If (e.Button = Windows.Forms.MouseButtons.Left) AndAlso _
-        (Me.SelectedTab IsNot Nothing) AndAlso (Not Me.GetTabRect(Me.SelectedIndex).IsEmpty) Then
+        (Me.SelectedTab IsNot Nothing) AndAlso (Not Me.GetTabRect(Me.SelectedIndex).IsEmpty) _
+        AndAlso (Me.GetTabRect(Me.SelectedIndex).IntersectsWith(New Rectangle(e.X, e.Y, 0, 0))) Then
             movingTab = Me.SelectedTab
         End If
 
@@ -149,16 +150,12 @@ Public Class customTabControl
                     Me.TabPages.Insert(Me.TabPages.IndexOf(mouseTab), movingTab)
                     Me.SelectedTab = movingTab
                     LockWindowUpdate(0)
-
-                    RaiseEvent TabsReordered(Me, EventArgs.Empty)
                 ElseIf (Me.TabPages.IndexOf(mouseTab) > Me.TabPages.IndexOf(movingTab)) Then
                     LockWindowUpdate(Me.FindForm().Handle)
                     Me.TabPages.Remove(movingTab)
                     Me.TabPages.Insert(Me.TabPages.IndexOf(mouseTab) + 1, movingTab)
                     Me.SelectedTab = movingTab
                     LockWindowUpdate(0)
-
-                    RaiseEvent TabsReordered(Me, EventArgs.Empty)
                 Else
                     Me.Cursor = Cursors.Default
                 End If
@@ -170,7 +167,10 @@ Public Class customTabControl
     End Sub
 
     Protected Overrides Sub OnMouseUp(ByVal e As MouseEventArgs)
-        movingTab = Nothing
+        If movingTab IsNot Nothing Then
+            movingTab = Nothing
+            RaiseEvent TabsReordered(Me, EventArgs.Empty)
+        End If
 
         MyBase.OnMouseUp(e)
     End Sub
@@ -271,11 +271,11 @@ Public Class customTabControl
         If Me.TabCount = 0 Then Exit Sub
         Dim scrollPos As Int32 = Math.Max(0, (ScrollPosition - 1) * &H10000)
 
-        LockWindowUpdate(Me.Handle)
+        LockWindowUpdate(Me.FindForm().Handle)
         SendMessage(Me.Handle, WM_HSCROLL, IntPtr.op_Explicit(scrollPos Or &H4), IntPtr.Zero)
         SendMessage(Me.Handle, WM_HSCROLL, IntPtr.op_Explicit(scrollPos Or &H8), IntPtr.Zero)
 
-        Me.CreateGraphics().Clear(SystemColors.InactiveCaptionText)
+        'TODO IS THIS OKAY NOT TO HAVE Me.CreateGraphics().Clear(SystemColors.InactiveCaptionText)
         OnPaint(New PaintEventArgs(Me.CreateGraphics(), Me.ClientRectangle))
         newScroller.Refresh()
 
@@ -287,11 +287,11 @@ Public Class customTabControl
         If GetTabRect(Me.TabCount - 1).Right <= newScroller.Left Then Return
         Dim scrollPos As Int32 = Math.Max(0, (ScrollPosition + 1) * &H10000)
 
-        LockWindowUpdate(Me.Handle)
+        LockWindowUpdate(Me.FindForm().Handle)
         SendMessage(Me.Handle, WM_HSCROLL, IntPtr.op_Explicit(scrollPos Or &H4), IntPtr.Zero)
         SendMessage(Me.Handle, WM_HSCROLL, IntPtr.op_Explicit(scrollPos Or &H8), IntPtr.Zero)
 
-        Me.CreateGraphics().Clear(SystemColors.InactiveCaptionText)
+        'Me.CreateGraphics().Clear(SystemColors.InactiveCaptionText)
         OnPaint(New PaintEventArgs(Me.CreateGraphics(), Me.ClientRectangle))
         newScroller.Refresh()
 

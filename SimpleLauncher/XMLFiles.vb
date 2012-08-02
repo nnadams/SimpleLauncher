@@ -7,21 +7,18 @@ Module XMLFiles
 
         Dim xmlFile As New XmlDocument
         xmlFile.Load(file)
-        Dim mainNode As XmlNodeList = xmlFile.SelectNodes("Enid")
+        Dim mainNode As XmlNodeList = xmlFile.SelectNodes("Project")
 
         If Not handleVersion(mainNode) Then Exit Sub
+        curProject.Name = mainNode.Item(0).Attributes(1).InnerText
+        curProject.Path = file
 
         For i As Short = 0 To mainNode.Item(0).ChildNodes.Count - 1
-            'If i = 1 Then
-            '    tabControl.SelectedIndex = 1
-            '    tabControl.SelectedTab.Text = mainNode.Item(0).ChildNodes(i).Attributes(0).InnerText
-            'Else
             Dim newTabPage As New TabPage(mainNode.Item(0).ChildNodes(i).Attributes(0).InnerText)
             newTabPage.BackColor = Color.FromArgb(255, 60, 70, 75)
             newTabPage.BorderStyle = BorderStyle.None
             tabControl.TabPages.Add(newTabPage)
             tabControl.SelectedIndex = tabControl.TabPages.Count - 1
-            'End If
 
             For j As Short = 0 To mainNode.Item(0).ChildNodes(i).ChildNodes.Count - 1
                 Dim newButton As New Button
@@ -43,19 +40,25 @@ Module XMLFiles
                 End With
             Next
         Next
+
+        curProject.isOpened = True
     End Sub
 
     Private Function handleVersion(ByVal mainNode As XmlNodeList) As Boolean
-        Dim filesVersion As String = mainNode.Item(0).Attributes(0).InnerText
-        Dim currentVersion As String = My.Application.Info.Version.Major & "." & My.Application.Info.Version.Minor
+        Try
+            Dim filesVersion As String = mainNode.Item(0).Attributes(0).InnerText
+            Dim currentVersion As String = My.Application.Info.Version.Major & "." & My.Application.Info.Version.Minor
 
-        If filesVersion <> currentVersion Then
-            If MsgBox("A different version of Enid was used to create this save file. Would you like to attempt to load it?", MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation) = MsgBoxResult.No Then
-                Return False
+            If filesVersion <> currentVersion Then
+                If MsgBox("A different version of Enid was used to create this save file. Would you like to attempt to load it?", MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation) = MsgBoxResult.No Then
+                    Return False
+                End If
             End If
-        End If
 
-        Return True
+            Return True
+        Catch e As Exception
+            MsgBox("The following error occured reading the verison info in " & e.TargetSite.ToString & ":" & vbCrLf & e.Message)
+        End Try
     End Function
 
     Public Function writeSaveFile(ByRef tabControl As customTabControl, ByVal file As String) As Boolean
@@ -66,12 +69,12 @@ Module XMLFiles
             xmlWriter.Indentation = 1
 
             xmlWriter.WriteStartDocument(True)
-            xmlWriter.WriteStartElement("Enid")
+            xmlWriter.WriteStartElement("Project")
             writeVersion(xmlWriter)
 
             For Each tp As TabPage In tabControl.TabPages
-                If tp.Text = "Start Page" Then Continue For
-                xmlWriter.WriteStartElement("Project")
+                If tp.Tag = "start" Then Continue For
+                xmlWriter.WriteStartElement("Folder")
                 xmlWriter.WriteStartAttribute("name")
                 xmlWriter.WriteString(tp.Text)
                 xmlWriter.WriteEndAttribute()
@@ -129,8 +132,11 @@ Module XMLFiles
     End Sub
 
     Private Sub writeVersion(ByVal xmlWriter As XmlTextWriter)
-        xmlWriter.WriteStartAttribute("version")
+        xmlWriter.WriteStartAttribute("eindVersion")
         xmlWriter.WriteString(My.Application.Info.Version.Major & "." & My.Application.Info.Version.Minor)
+        xmlWriter.WriteEndAttribute()
+        xmlWriter.WriteStartAttribute("projectName")
+        xmlWriter.WriteString(curProject.Name)
         xmlWriter.WriteEndAttribute()
     End Sub
 End Module

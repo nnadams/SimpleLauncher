@@ -64,7 +64,6 @@
         Me.ResumeLayout(False)
     End Sub
 #End Region
-
     Public Event ScrollLeft As EventHandler
     Public Event ScrollRight As EventHandler
 

@@ -6,10 +6,12 @@ Module Functions
     Public dialogAdd As New diaAdd
     Public dialogList As New diaList
 
+    Public curProject As _project
     Public frmMainLocked As Boolean = False
     Public lastPoint As Point = New Point(-1, -1)
     Public lastSize As Size = New Size(-1, -1)
 
+    Public Const defaultName As String = "Untitled"
     Public Const xStartDist As Integer = 2
     Public Const yStartDist As Integer = 2
     Public Const buttonPadding As Integer = 10
@@ -18,6 +20,12 @@ Module Functions
     Public audioExtensions() As String = {"3ga", "flac", "m3u", "m4a", "mid", "midi", "mka", "mp2", "mp3", "mpa", "oga", "ogg", "pls", "ra", "wav", "wma"}
     Public imageExtensions() As String = {"bmp", "dds", "dib", "gif", "jpeg", "jpg", "png", "psd", "ps", "svg", "tga", "tiff", "tif", "xcf"}
     Public progrExtensions() As String = {"com", "exe", "jar", "vbs", "wsf"}
+
+    Public Structure _project
+        Public Name As String
+        Public Path As String
+        Public isOpened As Boolean
+    End Structure
 
     <DllImport("user32.dll")> Public Function LockWindowUpdate(ByVal hWndLock As IntPtr) As Boolean
     End Function
@@ -34,7 +42,7 @@ Module Functions
     End Sub
 
     Public Function GetFileType(ByVal name As String) As String
-        Dim theExtension As String = Mid(name, InStrRev(name, ".") + 1)
+        Dim theExtension As String = Mid(name, InStrRev(name, ".") + 1).ToLower
         For Each ext As String In videoExtensions
             If theExtension = ext Then Return "film"
         Next
@@ -103,7 +111,11 @@ erro:
     End Function
 
     Public Function RemoveFile(ByVal Path As String) As String
-        Return Path.Replace(RemovePath(Path), "")
+        If Path = "" Then
+            Return ""
+        Else
+            Return Path.Replace(RemovePath(Path), "")
+        End If
     End Function
 
     Public Function RemovePath(ByVal Path As String) As String
