@@ -211,7 +211,7 @@ Public Class frmMain
         End If
     End Sub
 
-    Private Sub tvItems_AfterLabelEdit(ByVal sender As System.Object, ByVal e As System.Windows.Forms.NodeLabelEditEventArgs) Handles tvItems.AfterLabelEdit
+    Private Sub tvItems_AfterLabelEdit(ByVal sender As System.Object, ByVal e As System.Windows.Forms.NodeLabelEditEventArgs) Handles tvItems.AfterLabelEdit, CustomTreeView1.AfterLabelEdit
         If e.Label = "" Or (isNodeButton(e.Node) AndAlso searchForExisting(e.Label)) Then
             e.CancelEdit = True
         Else
@@ -230,15 +230,15 @@ Public Class frmMain
         End If
     End Sub
 
-    Private Sub tvItems_BeforeCollapse(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewCancelEventArgs) Handles tvItems.BeforeCollapse
+    Private Sub tvItems_BeforeCollapse(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewCancelEventArgs) Handles tvItems.BeforeCollapse, CustomTreeView1.BeforeCollapse
         e.Cancel = True
     End Sub
 
-    Private Sub tvItems_BeforeSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewCancelEventArgs) Handles tvItems.BeforeSelect
+    Private Sub tvItems_BeforeSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewCancelEventArgs) Handles tvItems.BeforeSelect, CustomTreeView1.BeforeSelect
         LockWindowUpdate(tvItems.Handle)
     End Sub
 
-    Private Sub tvItems_AfterSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles tvItems.AfterSelect
+    Private Sub tvItems_AfterSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles tvItems.AfterSelect, CustomTreeView1.AfterSelect
         If selectedOnRedraw Then selectedOnRedraw = False : Exit Sub
 
         If isNodeButton(e.Node) Then
@@ -275,7 +275,7 @@ Public Class frmMain
         LockWindowUpdate(0)
     End Sub
 
-    Private Sub tvItems_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles tvItems.KeyDown
+    Private Sub tvItems_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles tvItems.KeyDown, CustomTreeView1.KeyDown
         If e.KeyCode = Keys.F2 Then
             tvItems.LabelEdit = True
             tvItems.SelectedNode.BeginEdit()
@@ -284,7 +284,7 @@ Public Class frmMain
         End If
     End Sub
 
-    Private Sub tvItems_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles tvItems.MouseClick
+    Private Sub tvItems_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles tvItems.MouseClick, CustomTreeView1.MouseClick
         If e.Button = Windows.Forms.MouseButtons.Right Then
             tvItems.SelectedNode = tvItems.GetNodeAt(e.Location)
             If isNodeButton(tvItems.SelectedNode) Then
@@ -293,7 +293,7 @@ Public Class frmMain
         End If
     End Sub
 
-    Private Sub tvItems_MouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles tvItems.MouseDoubleClick
+    Private Sub tvItems_MouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles tvItems.MouseDoubleClick, CustomTreeView1.MouseDoubleClick
         If e.Button = Windows.Forms.MouseButtons.Left Then
             tvItems.SelectedNode = tvItems.GetNodeAt(e.Location)
             If frmMainLocked AndAlso tvItems.SelectedNode.Level > 0 Then
@@ -344,7 +344,7 @@ Public Class frmMain
 #End Region
 #Region "Form"
     Private Sub toNormal()
-        Me.FormBorderStyle = Windows.Forms.FormBorderStyle.Sizable
+        Me.FormBorderStyle = Windows.Forms.FormBorderStyle.Fixed3D
         Me.WindowState = FormWindowState.Normal
         Me.TopMost = False
         isFullScreen = False
@@ -468,11 +468,11 @@ Public Class frmMain
     End Sub
 
     Private Sub frmMain_Resize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Resize
-        rectcurProjects.Width = (tbMain.SelectedTab.Size.Width - 266) - 9
+        rectcurProjects.Width = (tbMain.SelectedTab.Size.Width - 270) - 9
         rectcurProjects.Height = (tbMain.SelectedTab.Size.Height - 3) - 8
         rectHelp.Height = (tbMain.SelectedTab.Size.Height - 492) - 10
 
-        lblcurProject.Left = ((rectcurProjects.Left + rectcurProjects.Width) / 2) + (lblcurProject.Width / 2)
+        lblcurProj.Left = ((rectcurProjects.Left + rectcurProjects.Width) / 2) + (lblcurProj.Width / 2)
     End Sub
 
     Private Sub frmMain_KeyDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
@@ -777,12 +777,12 @@ Public Class frmMain
 #End Region
 #Region "Start Page"
     Private Sub ResetAndLoad()
-        ClearProperties()
         CloseAllTabs()
         tvItems.Nodes.Clear()
         loadSaveFile(tbMain, curProject.Path)
         tbMain.SelectedIndex = 1
         CreateList()
+        ClearProperties()
         Me.Text = tbMain.SelectedTab.Text & " - Enid" & IIf(frmMainLocked, " (Locked)", "")
     End Sub
 
@@ -804,8 +804,8 @@ Public Class frmMain
                 End If
             Next
 
-            If lvProjects.Items.Count = 5 Then
-                lvProjects.Items.RemoveAt(4)
+            If lvProjects.Items.Count = 10 Then
+                lvProjects.Items.RemoveAt(9)
                 lvProjects.Items.Insert(0, newItem)
             Else
                 lvProjects.Items.Insert(0, newItem)
@@ -913,7 +913,7 @@ Public Class frmMain
         End If
     End Sub
 
-    Private Sub ClearToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ClearToolStripMenuItem.Click
+    Private Sub csRecentClear_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles csRecentClear.Click
         lvProjects.Clear()
         lvProjects.Items.Add(strNone)
         My.Settings.recentProjects.Clear()

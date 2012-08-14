@@ -84,11 +84,28 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="customListView\customListView.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="customScrollBar\ButtonPainters.vb" />
+    <Compile Include="customScrollBar\customScrollBar.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="customScrollBar\icustomScrollBar.vb" />
+    <Compile Include="customScrollBar\Painter.vb" />
+    <Compile Include="customScrollBar\PainterFilterNoText.vb" />
+    <Compile Include="customScrollBar\PainterFilterSize.vb" />
+    <Compile Include="customScrollBar\StackedPainters.vb" />
+    <Compile Include="customScrollBar\SymbolPainter.vb" />
+    <Compile Include="customScrollBar\WindowsStyledButtonPainter.vb" />
     <Compile Include="customTabControl\customTabControl.vb">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="customTabControl\NativeScroller.vb" />
     <Compile Include="customTabControl\TabScroller.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="customTreeView\customTreeView.vb">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="diaAdd.Designer.vb">
