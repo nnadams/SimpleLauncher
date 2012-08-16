@@ -211,7 +211,7 @@ Public Class frmMain
         End If
     End Sub
 
-    Private Sub tvItems_AfterLabelEdit(ByVal sender As System.Object, ByVal e As System.Windows.Forms.NodeLabelEditEventArgs) Handles tvItems.AfterLabelEdit, CustomTreeView1.AfterLabelEdit
+    Private Sub tvItems_AfterLabelEdit(ByVal sender As System.Object, ByVal e As System.Windows.Forms.NodeLabelEditEventArgs) Handles tvItems.AfterLabelEdit
         If e.Label = "" Or (isNodeButton(e.Node) AndAlso searchForExisting(e.Label)) Then
             e.CancelEdit = True
         Else
@@ -230,15 +230,15 @@ Public Class frmMain
         End If
     End Sub
 
-    Private Sub tvItems_BeforeCollapse(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewCancelEventArgs) Handles tvItems.BeforeCollapse, CustomTreeView1.BeforeCollapse
+    Private Sub tvItems_BeforeCollapse(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewCancelEventArgs) Handles tvItems.BeforeCollapse
         e.Cancel = True
     End Sub
 
-    Private Sub tvItems_BeforeSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewCancelEventArgs) Handles tvItems.BeforeSelect, CustomTreeView1.BeforeSelect
+    Private Sub tvItems_BeforeSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewCancelEventArgs) Handles tvItems.BeforeSelect
         LockWindowUpdate(tvItems.Handle)
     End Sub
 
-    Private Sub tvItems_AfterSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles tvItems.AfterSelect, CustomTreeView1.AfterSelect
+    Private Sub tvItems_AfterSelect(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles tvItems.AfterSelect
         If selectedOnRedraw Then selectedOnRedraw = False : Exit Sub
 
         If isNodeButton(e.Node) Then
@@ -275,7 +275,7 @@ Public Class frmMain
         LockWindowUpdate(0)
     End Sub
 
-    Private Sub tvItems_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles tvItems.KeyDown, CustomTreeView1.KeyDown
+    Private Sub tvItems_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles tvItems.KeyDown
         If e.KeyCode = Keys.F2 Then
             tvItems.LabelEdit = True
             tvItems.SelectedNode.BeginEdit()
@@ -284,7 +284,7 @@ Public Class frmMain
         End If
     End Sub
 
-    Private Sub tvItems_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles tvItems.MouseClick, CustomTreeView1.MouseClick
+    Private Sub tvItems_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles tvItems.MouseClick
         If e.Button = Windows.Forms.MouseButtons.Right Then
             tvItems.SelectedNode = tvItems.GetNodeAt(e.Location)
             If isNodeButton(tvItems.SelectedNode) Then
@@ -293,7 +293,7 @@ Public Class frmMain
         End If
     End Sub
 
-    Private Sub tvItems_MouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles tvItems.MouseDoubleClick, CustomTreeView1.MouseDoubleClick
+    Private Sub tvItems_MouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles tvItems.MouseDoubleClick
         If e.Button = Windows.Forms.MouseButtons.Left Then
             tvItems.SelectedNode = tvItems.GetNodeAt(e.Location)
             If frmMainLocked AndAlso tvItems.SelectedNode.Level > 0 Then
@@ -306,6 +306,26 @@ Public Class frmMain
                     Next
                 Next
             End If
+        End If
+    End Sub
+
+    Private Sub tvItems_ItemAdded(ByVal obj As customTreeView) Handles tvItems.ItemAdded
+        If tvItems.GetScrollMax() = 0 Then
+            sbTreeView.Visible = False
+            tvItems.UpdateScrollbar()
+        Else
+            sbTreeView.Visible = True
+            tvItems.UpdateScrollbar()
+        End If
+    End Sub
+
+    Private Sub tvItems_ItemsRemoved(ByVal obj As customTreeView) Handles tvItems.ItemsRemoved
+        If tvItems.GetScrollMax() = 0 Then
+            sbTreeView.Visible = False
+            tvItems.UpdateScrollbar()
+        Else
+            sbTreeView.Visible = True
+            tvItems.UpdateScrollbar()
         End If
     End Sub
 #End Region

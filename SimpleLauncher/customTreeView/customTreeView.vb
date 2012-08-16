@@ -73,8 +73,10 @@ Public Class customTreeView
     Private Const WM_NCCALCSIZE As UInt32 = &H83
 
     Private Const TV_FIRST As UInt32 = &H1100
-    Private Const TVM_INSERTITEM As UInt32 = (TV_FIRST + 0)
-    Private Const TVM_DELETEITEM As UInt32 = (TV_FIRST + 1)
+    Private Const TVM_INSERTITEMA As UInt32 = (TV_FIRST + 0)
+    Private Const TVM_DELETEITEMA As UInt32 = (TV_FIRST + 1)
+    Private Const TVM_INSERTITEMW As UInt32 = (TV_FIRST + 50)
+    Private Const TVM_DELETEITEMW As UInt32 = (TV_FIRST + 51)
     Private Const GWL_STYLE As Integer = -16
     Private Const WS_VSCROLL As Integer = &H200000
 
@@ -106,6 +108,22 @@ Public Class customTreeView
 
     Private _disableChangeEvents As Integer = 0
     Private _vScrollbar As IcustomScrollBar = Nothing
+
+    Public Function GetScrollMax() As Short
+        If GetNodeCount(True) * ItemHeight <= Height Then Return 0
+
+        Dim realHeight As Double = 0
+        For Each node As TreeNode In Nodes
+            If node.IsExpanded Then
+                realHeight += node.Nodes.Count
+            End If
+            realHeight += 1
+        Next
+
+        If (realHeight * ItemHeight) <= Height Then Return 0
+
+        Return realHeight - 1
+    End Function
 
     Private Sub BeginDisableChangeEvents()
         _disableChangeEvents += 1
@@ -299,9 +317,9 @@ Public Class customTreeView
             If (style And WS_VSCROLL) = WS_VSCROLL Then
                 SetWindowLong(Me.Handle, GWL_STYLE, style And Not WS_VSCROLL)
             End If
-        ElseIf m.Msg = TVM_INSERTITEM Then
+        ElseIf m.Msg = TVM_INSERTITEMA Or m.Msg = TVM_INSERTITEMW Then
             OnItemAdded()
-        ElseIf m.Msg = TVM_DELETEITEM Then
+        ElseIf m.Msg = TVM_DELETEITEMA Or m.Msg = TVM_DELETEITEMW Then
             OnItemsRemoved()
         End If
 

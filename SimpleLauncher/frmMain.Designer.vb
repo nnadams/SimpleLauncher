@@ -39,7 +39,6 @@ Partial Class frmMain
         Me.rectcurProjects = New Microsoft.VisualBasic.PowerPacks.RectangleShape
         Me.rectProjects = New Microsoft.VisualBasic.PowerPacks.RectangleShape
         Me.splitSide = New System.Windows.Forms.SplitContainer
-        Me.tvItems = New System.Windows.Forms.TreeView
         Me.imglstTree = New System.Windows.Forms.ImageList(Me.components)
         Me.chkVisible = New System.Windows.Forms.CheckBox
         Me.btnProgram = New System.Windows.Forms.Button
@@ -87,7 +86,8 @@ Partial Class frmMain
         Me.lnkNewProject = New System.Windows.Forms.LinkLabel
         Me.lblRecentProj = New System.Windows.Forms.Label
         Me.ShapeContainer1 = New Microsoft.VisualBasic.PowerPacks.ShapeContainer
-        Me.CustomTreeView1 = New Enid.customTreeView
+        Me.sbTreeView = New Enid.customScrollBar
+        Me.tvItems = New Enid.customTreeView
         Me.csButtons.SuspendLayout()
         Me.tsContainer.ContentPanel.SuspendLayout()
         Me.tsContainer.LeftToolStripPanel.SuspendLayout()
@@ -285,7 +285,8 @@ Partial Class frmMain
         '
         'splitSide.Panel1
         '
-        Me.splitSide.Panel1.Controls.Add(Me.CustomTreeView1)
+        Me.splitSide.Panel1.Controls.Add(Me.sbTreeView)
+        Me.splitSide.Panel1.Controls.Add(Me.tvItems)
         '
         'splitSide.Panel2
         '
@@ -316,24 +317,6 @@ Partial Class frmMain
         Me.splitSide.SplitterIncrement = 17
         Me.splitSide.SplitterWidth = 3
         Me.splitSide.TabIndex = 0
-        '
-        'tvItems
-        '
-        Me.tvItems.BackColor = System.Drawing.SystemColors.Highlight
-        Me.tvItems.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.tvItems.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.tvItems.ForeColor = System.Drawing.Color.White
-        Me.tvItems.HideSelection = False
-        Me.tvItems.ImageIndex = 0
-        Me.tvItems.ImageList = Me.imglstTree
-        Me.tvItems.LineColor = System.Drawing.Color.FromArgb(CType(CType(160, Byte), Integer), CType(CType(160, Byte), Integer), CType(CType(160, Byte), Integer))
-        Me.tvItems.Location = New System.Drawing.Point(727, 74)
-        Me.tvItems.Name = "tvItems"
-        Me.tvItems.SelectedImageIndex = 0
-        Me.tvItems.ShowRootLines = False
-        Me.tvItems.Size = New System.Drawing.Size(209, 445)
-        Me.tvItems.TabIndex = 0
-        Me.tvItems.TabStop = False
         '
         'imglstTree
         '
@@ -733,7 +716,6 @@ Partial Class frmMain
         'tpStart
         '
         Me.tpStart.BackColor = System.Drawing.SystemColors.InactiveCaptionText
-        Me.tpStart.Controls.Add(Me.tvItems)
         Me.tpStart.Controls.Add(Me.lnkLocatePlugins)
         Me.tpStart.Controls.Add(Me.lvProjects)
         Me.tpStart.Controls.Add(Me.lvPlugins)
@@ -917,25 +899,43 @@ Partial Class frmMain
         Me.ShapeContainer1.TabIndex = 0
         Me.ShapeContainer1.TabStop = False
         '
-        'CustomTreeView1
+        'sbTreeView
         '
-        Me.CustomTreeView1.BackColor = System.Drawing.SystemColors.InactiveCaptionText
-        Me.CustomTreeView1.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.CustomTreeView1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.CustomTreeView1.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!)
-        Me.CustomTreeView1.ForeColor = System.Drawing.Color.White
-        Me.CustomTreeView1.HideSelection = False
-        Me.CustomTreeView1.ImageIndex = 0
-        Me.CustomTreeView1.ImageList = Me.imglstTree
-        Me.CustomTreeView1.LineColor = System.Drawing.Color.FromArgb(CType(CType(160, Byte), Integer), CType(CType(160, Byte), Integer), CType(CType(160, Byte), Integer))
-        Me.CustomTreeView1.Location = New System.Drawing.Point(0, 0)
-        Me.CustomTreeView1.Name = "CustomTreeView1"
-        Me.CustomTreeView1.SelectedImageIndex = 0
-        Me.CustomTreeView1.ShowRootLines = False
-        Me.CustomTreeView1.Size = New System.Drawing.Size(261, 530)
-        Me.CustomTreeView1.TabIndex = 0
-        Me.CustomTreeView1.TabStop = False
-        Me.CustomTreeView1.VScrollbar = Nothing
+        Me.sbTreeView.AccessibleRole = System.Windows.Forms.AccessibleRole.ScrollBar
+        Me.sbTreeView.ActiveBackColor = System.Drawing.SystemColors.GradientActiveCaption
+        Me.sbTreeView.BackColor = System.Drawing.SystemColors.ControlLight
+        Me.sbTreeView.Dock = System.Windows.Forms.DockStyle.Right
+        Me.sbTreeView.LargeChange = 10
+        Me.sbTreeView.Location = New System.Drawing.Point(238, 0)
+        Me.sbTreeView.Maximum = 99
+        Me.sbTreeView.Minimum = 0
+        Me.sbTreeView.Name = "sbTreeView"
+        Me.sbTreeView.Size = New System.Drawing.Size(23, 530)
+        Me.sbTreeView.SmallChange = 1
+        Me.sbTreeView.TabIndex = 1
+        Me.sbTreeView.ThumbStyle = Enid.customScrollBar.ThumbStyleEnum.Small
+        Me.sbTreeView.Value = 0
+        Me.sbTreeView.Visible = False
+        '
+        'tvItems
+        '
+        Me.tvItems.BackColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.tvItems.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.tvItems.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.tvItems.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!)
+        Me.tvItems.ForeColor = System.Drawing.Color.White
+        Me.tvItems.HideSelection = False
+        Me.tvItems.ImageIndex = 0
+        Me.tvItems.ImageList = Me.imglstTree
+        Me.tvItems.LineColor = System.Drawing.Color.FromArgb(CType(CType(160, Byte), Integer), CType(CType(160, Byte), Integer), CType(CType(160, Byte), Integer))
+        Me.tvItems.Location = New System.Drawing.Point(0, 0)
+        Me.tvItems.Name = "tvItems"
+        Me.tvItems.SelectedImageIndex = 0
+        Me.tvItems.ShowRootLines = False
+        Me.tvItems.Size = New System.Drawing.Size(261, 530)
+        Me.tvItems.TabIndex = 0
+        Me.tvItems.TabStop = False
+        Me.tvItems.VScrollbar = Me.sbTreeView
         '
         'frmMain
         '
@@ -1009,7 +1009,6 @@ Partial Class frmMain
     Friend WithEvents lbltColor As System.Windows.Forms.Label
     Friend WithEvents colorDialog As System.Windows.Forms.ColorDialog
     Friend WithEvents lblVisible As System.Windows.Forms.Label
-    Friend WithEvents tvItems As System.Windows.Forms.TreeView
     Friend WithEvents imglstTree As System.Windows.Forms.ImageList
     Friend WithEvents ttColorMsg As System.Windows.Forms.ToolTip
     Friend WithEvents btnProgram As System.Windows.Forms.Button
@@ -1038,6 +1037,7 @@ Partial Class frmMain
     Friend WithEvents lnkLocatePlugins As System.Windows.Forms.LinkLabel
     Friend WithEvents csRecent As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents csRecentClear As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents CustomTreeView1 As Enid.customTreeView
+    Friend WithEvents tvItems As Enid.customTreeView
+    Friend WithEvents sbTreeView As Enid.customScrollBar
 
 End Class
