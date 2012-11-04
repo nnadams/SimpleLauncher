@@ -9,6 +9,9 @@ Public Class frmMain
     Private isTabNodeSelected As Boolean = False
     Private panel2Enabled As Boolean = False
     Private selectedOnRedraw As Boolean = False
+    Private lockTreeUpdates As Boolean = False
+
+    Private draggedNodesTab As TabPage = Nothing
 
     Private Const strNone As String = "                  (None)                  "
 #End Region
@@ -211,6 +214,24 @@ Public Class frmMain
         End If
     End Sub
 
+    Private Function InsertButton(ByRef Controls As TabPage.TabPageControlCollection, ByVal button As Button, ByVal index As Integer, ByVal clearControls As Boolean) As Control()
+        Dim theControls(0 To Controls.Count - 1) As Control
+        Dim newCollection(0 To Controls.Count) As Control
+        Dim tmp(0 To (theControls.Count() - index - 1)) As Control
+
+        Controls.CopyTo(theControls, 0)
+        Array.Copy(theControls, newCollection, index)
+        newCollection(index) = button
+        Array.Reverse(theControls)
+        Array.Copy(theControls, tmp, (theControls.Count() - index))
+        Array.Reverse(tmp)
+        tmp.CopyTo(newCollection, index + 1)
+
+        If clearControls Then Controls.Clear()
+
+        Return newCollection
+    End Function
+
     Private Sub tvItems_AfterLabelEdit(ByVal sender As System.Object, ByVal e As System.Windows.Forms.NodeLabelEditEventArgs) Handles tvItems.AfterLabelEdit
         If e.Label = "" Or (isNodeButton(e.Node) AndAlso searchForExisting(e.Label)) Then
             e.CancelEdit = True
@@ -328,6 +349,110 @@ Public Class frmMain
             tvItems.UpdateScrollbar()
         End If
     End Sub
+
+    Private Sub tvItems_ItemDrag(ByVal sender As System.Object, ByVal e As System.Windows.Forms.ItemDragEventArgs) Handles tvItems.ItemDrag
+        tvItems.SelectedNode = e.Item
+        draggedNodesTab = tbMain.SelectedTab
+        DoDragDrop(e.Item, DragDropEffects.Move)
+    End Sub
+
+    Private Sub tvItems_DragEnter(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles tvItems.DragEnter
+        If e.Data.GetDataPresent("System.Windows.Forms.TreeNode", True) Then
+            e.Effect = DragDropEffects.Move
+            lockTreeUpdates = True
+        Else
+            e.Effect = DragDropEffects.None
+        End If
+    End Sub
+
+    Private Sub tvItems_DragOver(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles tvItems.DragOver
+        If e.Data.GetDataPresent("System.Windows.Forms.TreeNode", True) = False Then Exit Sub
+
+        Dim pt As Point = tvItems.PointToClient(New Point(e.X, e.Y))
+        Dim targetNode As TreeNode = tvItems.GetNodeAt(pt)
+
+        If targetNode Is Nothing Then
+            e.Effect = DragDropEffects.None
+        ElseIf tvItems.SelectedNode IsNot targetNode Then
+            Dim dropNode As TreeNode = CType(e.Data.GetData("System.Windows.Forms.TreeNode"), TreeNode)
+
+            If dropNode.Level = 0 And targetNode.Level = 1 Then
+                tvItems.SelectedNode = targetNode.Parent
+            Else
+                tvItems.SelectedNode = targetNode
+            End If
+
+            Do Until targetNode Is Nothing
+                If targetNode Is dropNode Then
+                    e.Effect = DragDropEffects.None
+                    Exit Sub
+                End If
+                targetNode = targetNode.Parent
+            Loop
+        End If
+
+        e.Effect = DragDropEffects.Move
+    End Sub
+
+    Private Sub tvItems_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles tvItems.DragDrop
+        If draggedNodesTab Is Nothing OrElse e.Data.GetDataPresent("System.Windows.Forms.TreeNode", True) = False Then Exit Sub
+
+        Dim dropNode As TreeNode = CType(e.Data.GetData("System.Windows.Forms.TreeNode"), TreeNode)
+
+        If dropNode.Level = 1 Then
+            Dim control As Button = Nothing
+            For Each control In draggedNodesTab.Controls
+                If control.Text = dropNode.Text Then
+                    If tbMain.SelectedTab Is draggedNodesTab Then Exit For
+
+                    control.Location = New Point(0, 0)
+                    tbMain.SelectedTab.Controls.AddRange(InsertButton(tbMain.SelectedTab.Controls, control, tvItems.SelectedNode.Index, True))
+                    draggedNodesTab.Controls.Remove(control)
+                    Exit For
+                End If
+            Next
+
+            If tvItems.SelectedNode Is Nothing Then
+                dropNode.Remove()
+                tvItems.Nodes.Add(dropNode)
+            ElseIf tvItems.SelectedNode.Level = 1 Then
+                dropNode.Remove()
+                tvItems.SelectedNode.Parent.Nodes.Insert(tvItems.SelectedNode.Index, dropNode)
+            ElseIf tvItems.SelectedNode.Level = 0 Then
+                dropNode.Remove()
+                tvItems.SelectedNode.Nodes.Add(dropNode)
+            End If
+        ElseIf dropNode.Level = 0 Then
+            If tvItems.SelectedNode Is Nothing Then
+                dropNode.Remove()
+                tvItems.Nodes.Add(dropNode)
+            ElseIf tvItems.SelectedNode.Level = 0 Then
+                dropNode.Remove()
+                tvItems.Nodes.Insert(tvItems.SelectedNode.Index, dropNode)
+            ElseIf tvItems.SelectedNode.Level = 1 Then
+                dropNode.Remove()
+                tvItems.SelectedNode.Parent.Nodes.Insert(tvItems.SelectedNode.Index, dropNode)
+            End If
+
+            Dim startTab As TabPage = GetStartTab(), startTabIndex As Integer = GetStartTabIndex()
+            For Each node As TreeNode In tvItems.Nodes
+                For Each tab As TabPage In tbMain.TabPages
+                    If tab.Tag = "start" Then
+                        Continue For
+                    ElseIf tab.Text = node.Text Then
+                        tbMain.TabPages.Remove(tab)
+                        tbMain.TabPages.Insert(node.Index, tab)
+                    End If
+                Next
+            Next
+            tbMain.TabPages.Remove(startTab)
+            tbMain.TabPages.Insert(startTabIndex, startTab)
+        End If
+
+        dropNode.EnsureVisible()
+        tvItems.SelectedNode = dropNode
+        CreateList()
+    End Sub
 #End Region
 #Region "tbMain"
     Private Sub CloseAllTabs()
@@ -336,6 +461,23 @@ Public Class frmMain
             tbMain.TabPages.Remove(tp)
         Next
     End Sub
+
+    Private Function GetStartTab() As TabPage
+        For Each tab As TabPage In tbMain.TabPages
+            If tab.Tag = "start" Then Return tab
+        Next
+
+        Return Nothing
+    End Function
+
+    Private Function GetStartTabIndex() As Integer
+        For Each tab As TabPage In tbMain.TabPages
+            If tab.Tag = "start" Then Return tbMain.TabPages.IndexOf(tab)
+        Next
+
+        Return -1
+    End Function
+
 
     Private Sub tbMain_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbMain.SelectedIndexChanged
         If isTabNodeSelected Then
@@ -459,23 +601,6 @@ Public Class frmMain
         curProject.isOpened = False
         tbMain.TabPages(0).BackColor = Color.FromArgb(255, 60, 70, 75)
         If My.Settings.recentProjects Is Nothing Then My.Settings.recentProjects = New Specialized.StringCollection()
-
-        'If My.Computer.FileSystem.FileExists(datFile) Then
-        '    loadSaveFile(tbMain, datFile)
-        '    tbMain.SelectedIndex = 1
-        '    Me.Text = tbMain.SelectedTab.Text & " - Enid"
-
-        '    ClearProperties()
-        '    CreateList()
-        'Else
-        '    tbMain.SelectedTab.Text = "Untitled"
-        '    Me.Text = tbMain.SelectedTab.Text & " - Enid"
-
-        '    Dim projectNode As New TreeNode("Untitled")
-        '    projectNode.ImageKey = "folder"
-        '    projectNode.SelectedImageKey = "folder"
-        '    tvItems.Nodes.Add(projectNode)
-        'End If
     End Sub
 
     Private Sub frmMain_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
@@ -488,11 +613,11 @@ Public Class frmMain
     End Sub
 
     Private Sub frmMain_Resize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Resize
-        rectcurProjects.Width = (tbMain.SelectedTab.Size.Width - 270) - 9
-        rectcurProjects.Height = (tbMain.SelectedTab.Size.Height - 3) - 8
-        rectHelp.Height = (tbMain.SelectedTab.Size.Height - 492) - 10
+        rectHelp.Height = (tbMain.SelectedTab.Size.Height - 488)
+        pnlProject.Width = pnlProject.Parent.Width - (rectHelp.Left + rectHelp.Width + 15)
 
-        lblcurProj.Left = ((rectcurProjects.Left + rectcurProjects.Width) / 2) + (lblcurProj.Width / 2)
+        lblcurProj.Left = (pnlProject.Width / 2) - (lblcurProj.Width / 2)
+        lblcurPath.Left = (pnlProject.Width / 2) - (lblcurPath.Width / 2)
     End Sub
 
     Private Sub frmMain_KeyDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
@@ -500,6 +625,7 @@ Public Class frmMain
             If isFullScreen Then toNormal() Else toFullScreen()
         ElseIf e.KeyCode = Keys.F4 Then
             If splitMain.Panel2Collapsed Then splitMain.Panel2Collapsed = False Else splitMain.Panel2Collapsed = True
+            UpdateStartPage()
         End If
     End Sub
 
@@ -784,7 +910,7 @@ Public Class frmMain
         Next
     End Sub
 
-    Private Sub txttColor_MouseHover(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txttColor.MouseHover, txtColor.MouseHover
+    Private Sub lblColor_MouseHover(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lbltColor.MouseHover, lblColor.MouseHover
         Dim control As Control = sender
         ttColorMsg.Show("Double-click to view a color picker", control)
     End Sub
@@ -796,6 +922,12 @@ Public Class frmMain
     End Sub
 #End Region
 #Region "Start Page"
+    Private Sub UpdateStartPage()
+        pnlProject.Width = pnlProject.Parent.Width - (rectHelp.Left + rectHelp.Width + 15)
+        lblcurProj.Left = (pnlProject.Width / 2) - (lblcurProj.Width / 2)
+        lblcurPath.Left = (pnlProject.Width / 2) - (lblcurPath.Width / 2)
+    End Sub
+
     Private Sub ResetAndLoad()
         CloseAllTabs()
         tvItems.Nodes.Clear()
@@ -803,6 +935,13 @@ Public Class frmMain
         tbMain.SelectedIndex = 1
         CreateList()
         ClearProperties()
+
+        lblcurProj.Text = curProject.Name
+        lblcurProj.Tag = ""
+        lblcurPath.Text = curProject.Path
+        lblcurProj.Left = (pnlProject.Width / 2) - (lblcurProj.Width / 2)
+        lblcurPath.Left = (pnlProject.Width / 2) - (lblcurPath.Width / 2)
+        lblcurPath.Visible = True
         Me.Text = tbMain.SelectedTab.Text & " - Enid" & IIf(frmMainLocked, " (Locked)", "")
     End Sub
 
@@ -940,8 +1079,59 @@ Public Class frmMain
         My.Settings.Save()
     End Sub
 
-    Private Sub lnkLocatePlugins_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lnkLocatePlugins.LinkClicked
+    Private Sub lblcurProj_Move(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lblcurProj.Move
+        txtcurProj.Size = lblcurProj.Size
+        txtcurProj.Location = lblcurProj.Location
+    End Sub
+
+    Private Sub lblcurProj_DoubleClick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lblcurProj.DoubleClick
+        If lblcurProj.Tag <> "" Then Exit Sub
+        txtcurProj.Text = lblcurProj.Text
+        txtcurProj.Tag = txtcurProj.Text
+        lblcurProj.Visible = False
+        txtcurProj.Visible = True
+    End Sub
+
+    Private Sub txtcurProj_KeyDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles txtcurProj.KeyDown
+        If txtcurProj.Text <> "" AndAlso txtcurProj.Visible Then
+            If e.KeyCode = Keys.Enter Then
+                txtcurProj.Visible = False
+                lblcurProj.Text = txtcurProj.Text
+                curProject.Name = txtcurProj.Text
+                Me.Text = curProject.Name & " - Enid" & IIf(frmMainLocked, " (Locked)", "")
+                lblcurProj.Left = (pnlProject.Width / 2) - (lblcurProj.Width / 2)
+                lblcurProj.Visible = True
+                lblcurProj.Focus()
+            ElseIf e.KeyCode = Keys.Escape Then
+                txtcurProj.Visible = False
+                lblcurProj.Left = (pnlProject.Width / 2) - (lblcurProj.Width / 2)
+                lblcurProj.Visible = True
+                lblcurProj.Focus()
+            End If
+        End If
+    End Sub
+
+    Private Sub txtcurProj_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtcurProj.TextChanged
+        If Len(txtcurProj.Text) < 50 AndAlso Len(txtcurProj.Text) > 0 Then
+            txtcurProj.Width = Len(txtcurProj.Text) * 16
+        ElseIf Len(txtcurProj.Text) = 0 Then
+            txtcurProj.Width = 16
+        End If
+
+        txtcurProj.Left = (pnlProject.Width / 2) - (txtcurProj.Width / 2)
+    End Sub
+
+    Private Sub lnkLocatePlugins_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lnkLocatePlugins.LinkClicked, lnkAbout.LinkClicked
         ' TODO Plugins
     End Sub
 #End Region
+
+    Private Sub CustomListView1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CustomListView1.MouseHover
+        ToolTip1.Show("Lorem ipsum dolor sit amet, euismod tollam impedit mecum loci haec! Quod non ait est amet constanter determinatio vestes, individuationis est cum autem est cum. Hellenicus ut casus inferioribus civitatis intelligitur sicut autem Apolloni sed, erexit quia iuvenis omnia in fuerat. Sua coniuge per sanctus primum subsannio oculos ut diem derelinquere patris inaudita sanctae memoriam mortuum sufficeret rex. Mytilenam cuius ait regem consolatus dum est Apollonius ut sua confusus eos est cum unde ascendit deferunt provoces. Amet amet constanter approximavit te in modo cavendum es ego dum miror diligere quem est se est in. Nunc eius non solutionem invenisti naufragus ferro conparuit de. Eum ego esse haec vidit pater vero rex cum obiectum est Apollonius. Dionysiade conspectu aliqua ait mea vero cum obiectum dixit hoc. Fige omnium Ephesum iube creasti hoc ait est cum magna. A his carpens introivit ipse didicit Deponiturque itaque die. Me in deinde cupis auras narrans diffusa cella iuvenis omnia salva deus credas suorum. Ut casus adprehendens melius ait est se est cum autem illud hendrerit ad te." & vbCrLf & "Nutricem rex ut a a civitas ex hic nisi se est in fuerat se vero quo. Fecisti in modo ad te finis puellam materia amicis in modo genito in. Antiochi quidditas iter carta pluribus formosae suam ut casus turbata procidit est in deinde plectrum anni ipsa quod tamen cursu. Fugere rediit in rei civibus in fuerat se vero non dum. Scilicet Athenagora eius sed dominum depressit filia puella sed eu fugiens laudo in. Aegypti regionibus in modo cavendum es sed eu fides Concordi fabricata ait. Solum epulas quattuor hominem armatis exanimem scientiam pervenisset. Plenus vado est amet coram me missam ne a his auditorio iubet comprehenderent in fuerat eum ego esse deprecor. Ephesiorum quod tamen cursu rapientes Tharsiae ortam adipiscing enixa ait in lucem in.", CustomListView1)
+    End Sub
+
+    Private Sub ToolTip1_Popup(ByVal sender As System.Object, ByVal e As System.Windows.Forms.PopupEventArgs) Handles ToolTip1.Popup
+        e.ToolTipSize = New Size(750, e.ToolTipSize.Width + e.ToolTipSize.Height)
+
+    End Sub
 End Class

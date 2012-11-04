@@ -19,7 +19,7 @@ Module Functions
     Public videoExtensions() As String = {"3gp", "3gp2", "avi", "divx", "f4v", "flv", "m2p", "m4v", "mkv", "mov", "mp4", "mpeg", "mpg", "mts", "ogm", "ogv", "rm", "rmvb", "swf", "vob", "webm", "wmv", "xvid"}
     Public audioExtensions() As String = {"3ga", "flac", "m3u", "m4a", "mid", "midi", "mka", "mp2", "mp3", "mpa", "oga", "ogg", "pls", "ra", "wav", "wma"}
     Public imageExtensions() As String = {"bmp", "dds", "dib", "gif", "jpeg", "jpg", "png", "psd", "ps", "svg", "tga", "tiff", "tif", "xcf"}
-    Public progrExtensions() As String = {"com", "exe", "jar", "vbs", "wsf"}
+    Public progrExtensions() As String = {"com", "exe", "jar"}
 
     Public Structure _project
         Public Name As String
